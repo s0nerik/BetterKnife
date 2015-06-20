@@ -1,9 +1,9 @@
 include  \
-    ':SwissKnife',
+    ':BetterKnife',
     ':sample',
-    ':wear',
+    ':wear'
 
-rootProject.name = 'SwissKnife'
+rootProject.name = 'BetterKnife'
 
 def setBuildFile(project) {
   project.buildFileName = "${project.name.toLowerCase()}.gradle"

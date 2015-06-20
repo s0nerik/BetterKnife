@@ -26,7 +26,7 @@ android {
     buildToolsVersion commonVersions.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.dexafree.sample"
+        applicationId "com.github.s0nerik.betterknife.sample"
         minSdkVersion 8
         targetSdkVersion project.targetSdkVersion
 
@@ -51,8 +51,8 @@ android {
 }
 
 dependencies {
-    compile project(':SwissKnife')
+    compile project(':BetterKnife')
     compile 'org.codehaus.groovy:groovy:2.4.3:grooid'
     compile "org.codehaus.groovy:groovy:$commonVersions.grooidVersion:grooid"
-    compile 'com.android.support:appcompat-v7:22.1.1'
+    compile 'com.android.support:appcompat-v7:22.2.0'
 }

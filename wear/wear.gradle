@@ -17,7 +17,7 @@ android {
     buildToolsVersion commonVersions.buildToolsVersion
 
     defaultConfig {
-        applicationId "me.groovy.wearapp"
+        applicationId "com.github.s0nerik.wear"
         minSdkVersion 20
         targetSdkVersion project.targetSdkVersion
 

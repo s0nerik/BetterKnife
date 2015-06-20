@@ -1,0 +1,4 @@
+moduleName=android-dsl
+moduleVersion=1.0
+extensionClasses=com.arasthel.swissknife.dsl.AndroidDSL,com.arasthel.swissknife.dsl.AndroidEventDSL,com.arasthel.betterknife.dsl.AndroidBundleDSL,com.arasthel.swissknife.dsl.AndroidContextDSL, com.github.s0nerik.arasthel.swissknife.dsl.AndroidFragmentDSL
+staticExtensionClasses=com.github.s0nerik.betterknife.dsl.AndroidStaticBundleDSL
