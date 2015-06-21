@@ -1,52 +1,63 @@
 package com.github.s0nerik.betterknife.annotations
-
+import android.app.Activity
+import android.support.v4.app.Fragment
 import android.view.View
-import com.github.s0nerik.betterknife.utils.AnnotationUtils
-import groovyjarjarasm.asm.Opcodes
-import org.codehaus.groovy.ast.*
-import org.codehaus.groovy.ast.stmt.BlockStatement
-import org.codehaus.groovy.ast.stmt.Statement
+import groovy.transform.CompileStatic
+import org.codehaus.groovy.ast.ASTNode
+import org.codehaus.groovy.ast.AnnotationNode
+import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.control.CompilePhase
 import org.codehaus.groovy.control.SourceUnit
-import org.codehaus.groovy.transform.ASTTransformation
+import org.codehaus.groovy.transform.AbstractASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 
-/**
- * Created by Arasthel on 16/08/14.
- */
 @GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
-public class InjectViewTransformation implements ASTTransformation, Opcodes {
+@CompileStatic
+final class InjectViewTransformation extends AbstractASTTransformation {
+
+    private static final List<Class> SUPPORTED_CLASSES = [Activity, Fragment]
 
     @Override
     void visit(ASTNode[] astNodes, SourceUnit sourceUnit) {
-        FieldNode annotatedField = astNodes[1];
-        AnnotationNode annotation = astNodes[0];
-        ClassNode declaringClass = annotatedField.declaringClass;
+        init(astNodes, sourceUnit)
+        if (!astNodes) return
+        if (!astNodes[0] || !astNodes[1]) return
+        if (!(astNodes[0] instanceof AnnotationNode)) return
+        if (!(astNodes[1] instanceof FieldNode)) return
 
-        if (!AnnotationUtils.isSubtype(annotatedField.getType(), View.class)) {
-            throw new Exception("Annotated field must extend View class. Type: " +
-                    "${annotatedField.type.name}");
+        def annotation = astNodes[0] as AnnotationNode
+        def fieldNode = astNodes[1] as FieldNode
+        def declaringClass = fieldNode.declaringClass
+
+        if (!AstUtils.isSubclass(fieldNode.type, View)) {
+            addError("Annotated field must extend View class. Type: ${fieldNode.type.name}", fieldNode)
+            return
         }
 
-        MethodNode injectMethod = AnnotationUtils.getInjectViewsMethod(declaringClass);
+        // View id expression
+        def id = annotation.getMember "value"
 
-        Variable viewParameter = injectMethod.parameters.first()
-
-        String id = null;
-
-        if (annotation.members.size() > 0) {
-            id = annotation.members.value.property.getValue();
+        if (!SUPPORTED_CLASSES.find {AstUtils.isSubclass(declaringClass, it)}) {
+            addError("@InjectView can only be applied to the fields of Activity and Fragment.", declaringClass)
+            return
         }
 
-        if (id == null) {
-            id = annotatedField.name;
+        def injectMethod = InjectionUtils.getInjectViewsMethod declaringClass
+
+        // Activity case
+        if (AstUtils.isSubclass(declaringClass, Activity)) {
+            ActivityUtils.appendFindViewByIdStatement(injectMethod, fieldNode, id)
+            if ((declaringClass.modifiers & ACC_ABSTRACT) != ACC_ABSTRACT) { // This activity is not abstract
+                try {
+                    ActivityUtils.injectViews(declaringClass)
+                } catch (Exception e) {
+                    addError(e.message, declaringClass)
+                }
+            }
+        } else if (AstUtils.isSubclass(declaringClass, Fragment)) {
+            FragmentUtils.appendFindViewByIdStatement(injectMethod, fieldNode, id)
+            FragmentUtils.injectViews(declaringClass)
         }
-
-        Statement statement = AnnotationUtils.createInjectExpression(annotatedField,
-                viewParameter, id)
-
-        List<Statement> statementList = ((BlockStatement) injectMethod.getCode()).getStatements();
-        statementList.add(statement);
-
     }
+
 }

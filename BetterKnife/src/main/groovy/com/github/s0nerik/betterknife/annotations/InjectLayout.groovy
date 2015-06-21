@@ -8,8 +8,9 @@ import java.lang.annotation.RetentionPolicy
 import java.lang.annotation.Target
 
 @Retention(RetentionPolicy.SOURCE)
-@Target([ElementType.FIELD])
-@GroovyASTTransformationClass(classes = [InjectViewTransformation])
-@interface InjectView {
+@Target([ElementType.TYPE])
+@GroovyASTTransformationClass(classes = [InjectLayoutTransformation])
+@interface InjectLayout {
     int value() default -1;
+    boolean injectAllViews() default false;
 }
