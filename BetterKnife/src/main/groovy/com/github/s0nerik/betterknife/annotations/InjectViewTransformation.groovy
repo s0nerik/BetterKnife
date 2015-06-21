@@ -2,6 +2,10 @@ package com.github.s0nerik.betterknife.annotations
 import android.app.Activity
 import android.support.v4.app.Fragment
 import android.view.View
+import com.github.s0nerik.betterknife.utils.ActivityUtils
+import com.github.s0nerik.betterknife.utils.AstUtils
+import com.github.s0nerik.betterknife.utils.FragmentUtils
+import com.github.s0nerik.betterknife.utils.InjectionUtils
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.ast.ASTNode
 import org.codehaus.groovy.ast.AnnotationNode

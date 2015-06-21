@@ -1,4 +1,6 @@
-package com.github.s0nerik.betterknife.annotations
+package com.github.s0nerik.betterknife.utils
+
+import com.github.s0nerik.betterknife.annotations.InjectView
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode

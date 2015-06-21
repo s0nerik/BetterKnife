@@ -1,4 +1,4 @@
-package com.github.s0nerik.betterknife.annotations
+package com.github.s0nerik.betterknife.utils
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

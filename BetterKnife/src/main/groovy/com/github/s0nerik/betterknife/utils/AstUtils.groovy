@@ -1,4 +1,4 @@
-package com.github.s0nerik.betterknife.annotations
+package com.github.s0nerik.betterknife.utils
 
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
