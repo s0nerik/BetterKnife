@@ -8,6 +8,9 @@ import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.Statement
+import org.codehaus.groovy.ast.stmt.TryCatchStatement
+
+import java.lang.reflect.Method
 
 import static org.codehaus.groovy.ast.tools.GeneralUtils.*
 import static org.codehaus.groovy.ast.tools.GeneralUtils.args
@@ -20,10 +23,10 @@ public class AnnotationUtils {
     static final Class[] PARCELABLE_CLASSES = [String, int, byte, char, double, boolean, float,
                                                long, short, Integer, CharSequence, Bundle]
 
-    public static MethodNode getSetExtrasMethod(ClassNode declaringClass) {
-        Parameter[] parameters = [new Parameter(ClassHelper.make(Bundle), "extras")]
+    public static MethodNode getSetExtrasMethod(ClassNode declaringClass, String methodName, String paramName) {
+        Parameter[] parameters = [new Parameter(ClassHelper.make(Bundle), paramName)]
 
-        MethodNode setExtrasMethod = declaringClass.getMethod("setExtras", parameters)
+        MethodNode setExtrasMethod = declaringClass.getMethod(methodName, parameters)
         if(setExtrasMethod == null) {
             setExtrasMethod = createSetExtrasMethod()
             declaringClass.addMethod(setExtrasMethod)
@@ -31,15 +34,15 @@ public class AnnotationUtils {
         return setExtrasMethod
     }
 
-    private static MethodNode createSetExtrasMethod() {
+    private static MethodNode createSetExtrasMethod(String methodName, String paramName) {
 
-        def activityParam = new Parameter(ClassHelper.make(Bundle), "extras")
+        def activityParam = new Parameter(ClassHelper.make(Bundle), paramName)
 
         Parameter[] parameters = [activityParam]
 
         BlockStatement blockStatement = block()
 
-        MethodNode node = new MethodNode("setExtras",
+        MethodNode node = new MethodNode(methodName,
                 Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL,
                 ClassHelper.VOID_TYPE,
                 parameters,
@@ -52,9 +55,14 @@ public class AnnotationUtils {
     public static MethodNode getInjectViewsMethod(ClassNode declaringClass) {
         Parameter[] parameters = [new Parameter(ClassHelper.make(Object.class), "view")]
 
-        MethodNode injectMethod = declaringClass.getMethod("injectViews", parameters)
+        MethodNode injectMethod = declaringClass.getDeclaredMethod("injectViews", parameters)
         if (injectMethod == null) {
             injectMethod = createInjectMethod()
+            // Some parent class has injectViews
+            if (declaringClass.getMethod("injectViews", parameters)) {
+                def block = injectMethod.getCode() as BlockStatement
+                block.addStatement(stmt(callSuperX("injectViews", args(parameters))))
+            }
             declaringClass.addMethod(injectMethod)
         }
 
@@ -64,6 +72,10 @@ public class AnnotationUtils {
     private static MethodNode createInjectMethod() {
 
         BlockStatement blockStatement = block(
+                declS(varX("currentClass", ClassHelper.CLASS_Type), callThisX("getClass")),
+                declS(varX("superClass"), callX(callX(varX("currentClass"), "getClass"), "getSuperclass")),
+                declS(varX("method", ClassHelper.make(MetaMethod)), callX(callX(varX("superClass"), "getMetaClass"), "pickMethod", args(constX("injectViews"), classX(Object)))),
+                ifS(notNullX(varX("method")), callSuperX("injectViews", args(castX(ClassHelper.OBJECT_TYPE, varX("view"))))),
                 declS(varX("v", ClassHelper.make(View)), constX(null))
         )
 
@@ -210,7 +222,7 @@ public class AnnotationUtils {
 
         return original.getInterfaces().find {
             it == ClassHelper.make(implementable)
-        }
+        } || original == ClassHelper.make(implementable)
 
     }
 
