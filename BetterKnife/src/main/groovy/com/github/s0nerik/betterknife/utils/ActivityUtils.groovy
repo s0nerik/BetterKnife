@@ -62,6 +62,8 @@ final class ActivityUtils {
     }
 
     static void injectViews(ClassNode activityClass) throws Exception {
+        if(isActivityHasInjectedParent(activityClass)) return
+
         def onCreateMethod = activityClass.methods.find {it.name == "onCreate" && it.parameters.size() == 1}
         if (!onCreateMethod) {
             onCreateMethod = createOnCreateMethod()
@@ -91,5 +93,11 @@ final class ActivityUtils {
 
     }
 
+    static boolean isActivityHasInjectedParent(ClassNode activityClass) {
+        def onCreateMethods = activityClass.getMethods("onCreate").findAll {it.parameters.size() == 1}
+        onCreateMethods.find {
+            AstUtils.findStatementByLabel(AstUtils.getMethodStatements(it), InjectionUtils.createInjectViewsCall().statementLabel)
+        }
+    }
 
 }

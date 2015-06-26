@@ -1,6 +1,6 @@
 package com.github.s0nerik.betterknife.annotations
 
-import com.arasthel.swissknife.utils.AnnotationUtils
+import com.github.s0nerik.betterknife.utils.AnnotationUtils
 import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.stmt.BlockStatement

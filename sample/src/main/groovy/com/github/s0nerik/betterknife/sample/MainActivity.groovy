@@ -7,12 +7,13 @@ import android.support.v7.app.AppCompatActivity
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.*
-import com.github.s0nerik.betterknife.BetterKnife
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.ListView
+import android.widget.TextView
 import com.github.s0nerik.betterknife.annotations.*
 import com.github.s0nerik.betterknife.annotations.resources.StringRes
 import com.github.s0nerik.betterknife.dsl.components.GAsyncTask
-
 import groovy.transform.CompileStatic
 
 import static com.github.s0nerik.betterknife.dsl.AndroidDSL.async
@@ -106,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState)
         mContext = this
         contentView = R.layout.activity_main
-        BetterKnife.inject this
+//        BetterKnife.inject this
 
 
         firstTextView.text = "$title <-- this thing was injected from strings.xml"

@@ -1,5 +1,4 @@
 package com.github.s0nerik.betterknife.utils
-
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import groovyjarjarasm.asm.Opcodes
@@ -27,7 +26,7 @@ final class AstUtils {
     }
 
     /**
-     * Creates method with a label assigned to it.
+     * Creates method call with a label assigned to it.
      * @param methodName
      * @param arguments
      * @param label
@@ -132,6 +131,8 @@ final class AstUtils {
      * @return Statements of the method.
      */
     static List<Statement> getMethodStatements(MethodNode method) {
+        if (method.code instanceof ReturnStatement)
+            return [method.code];
         return (method.code as BlockStatement).statements
     }
 

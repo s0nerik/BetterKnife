@@ -12,7 +12,7 @@ import java.lang.annotation.Target
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
-@GroovyASTTransformationClass(["com.arasthel.swissknife.annotations.FragmentArgTransformation"])
+@GroovyASTTransformationClass(classes = [FragmentArgTransformation])
 public @interface FragmentArg {
     String value() default "";
 }

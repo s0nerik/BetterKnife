@@ -17,7 +17,7 @@ android {
     buildToolsVersion commonVersions.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.github.s0nerik.wear"
+        applicationId "com.github.s0nerik.betterknife.wear"
         minSdkVersion 20
         targetSdkVersion project.targetSdkVersion
 
