@@ -51,13 +51,11 @@ final class InjectViewTransformation extends AbstractASTTransformation {
         // Activity case
         if (AstUtils.isSubclass(declaringClass, Activity)) {
             ActivityUtils.appendFindViewByIdStatement(injectMethod, fieldNode, id)
-//            if ((declaringClass.modifiers & ACC_ABSTRACT) != ACC_ABSTRACT) { // This activity is not abstract
-                try {
-                    ActivityUtils.injectViews(declaringClass)
-                } catch (Exception e) {
-                    addError(e.message, declaringClass)
-                }
-//            }
+            try {
+                ActivityUtils.injectViews(declaringClass)
+            } catch (Exception e) {
+                addError(e.message, declaringClass)
+            }
         } else if (AstUtils.isSubclass(declaringClass, Fragment)) {
             FragmentUtils.appendFindViewByIdStatement(injectMethod, fieldNode, id)
             FragmentUtils.injectViews(declaringClass)

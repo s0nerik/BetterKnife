@@ -1,4 +1,4 @@
-package com.github.s0nerik.betterknife.inject_view_activities.inheritance
+package com.github.s0nerik.betterknife.inject_view.activity.inheritance
 
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button

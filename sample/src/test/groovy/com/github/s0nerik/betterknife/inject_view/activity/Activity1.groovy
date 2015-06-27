@@ -1,4 +1,4 @@
-package com.github.s0nerik.betterknife.inject_view_activities
+package com.github.s0nerik.betterknife.inject_view.activity
 
 import android.app.Activity
 import android.os.Bundle

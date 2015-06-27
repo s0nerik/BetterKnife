@@ -1,15 +1,19 @@
 package com.github.s0nerik.betterknife
 
-import com.github.s0nerik.betterknife.inject_view_activities.Activity1
-import com.github.s0nerik.betterknife.inject_view_activities.Activity2
-import com.github.s0nerik.betterknife.inject_view_activities.Activity3
-import com.github.s0nerik.betterknife.inject_view_activities.inheritance.ChildActivity
+import com.github.s0nerik.betterknife.inject_view.activity.Activity1
+import com.github.s0nerik.betterknife.inject_view.activity.Activity2
+import com.github.s0nerik.betterknife.inject_view.activity.Activity3
+import com.github.s0nerik.betterknife.inject_view.activity.inheritance.ChildActivity
+import com.github.s0nerik.betterknife.inject_view.fragment.Fragment1
+import com.github.s0nerik.betterknife.inject_view.fragment.Fragment2
+import com.github.s0nerik.betterknife.inject_view.fragment.inheritance.ChildFragment
 import com.github.s0nerik.betterknife.util.SampleSpecification
 import org.robolectric.Robolectric
+import org.robolectric.util.FragmentTestUtil
 
 class InjectViewSpec extends SampleSpecification {
 
-    def "should inject parent view and it's own"() {
+    def "injecting views into activity inherited from base activity"() {
         given:
         def childActivity = Robolectric.buildActivity(ChildActivity).create().get()
 
@@ -44,6 +48,40 @@ class InjectViewSpec extends SampleSpecification {
         activity.first
         activity.second
         activity.testFlag
+    }
+
+    def "injecting views into fragment without @InjectLayout and onCreateView() defined"() {
+        given:
+        def fragment = new Fragment1()
+
+        when:
+        FragmentTestUtil.startFragment(fragment)
+
+        then:
+        fragment.tv1
+    }
+
+    def "injecting views into fragment with @InjectLayout and no onCreateView() defined"() {
+        given:
+        def fragment = new Fragment2()
+
+        when:
+        FragmentTestUtil.startFragment(fragment)
+
+        then:
+        fragment.tv1
+    }
+
+    def "injecting views into fragment inherited from base fragment"() {
+        given:
+        def fragment = new ChildFragment()
+
+        when:
+        FragmentTestUtil.startFragment(fragment)
+
+        then:
+        fragment.tv1
+        fragment.tv2
     }
 
 }
