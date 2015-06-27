@@ -18,6 +18,7 @@ tasks.whenTaskAdded {
     }
 }
 
+apply plugin: 'android-sdk-manager'
 apply plugin: 'com.android.application'
 apply plugin: 'groovyx.grooid.groovy-android'
 
@@ -27,7 +28,7 @@ android {
 
     defaultConfig {
         applicationId "com.github.s0nerik.betterknife.sample"
-        minSdkVersion 8
+        minSdkVersion 15
         targetSdkVersion project.targetSdkVersion
 
         versionCode project.versionCode
@@ -59,18 +60,13 @@ android {
 
 dependencies {
     compile project(':BetterKnife')
-//    compile 'org.codehaus.groovy:groovy:2.4.3:grooid'
     compile "org.codehaus.groovy:groovy:$commonVersions.grooidVersion:grooid"
-    compile 'com.android.support:appcompat-v7:22.2.0'
+    compile "com.android.support:appcompat-v7:$commonVersions.androidSupportVersion"
+    compile "com.android.support:support-v4:$commonVersions.androidSupportVersion"
 
-//    compile 'org.slf4j:slf4j-api:1.7.12'
-//    compile 'org.slf4j:slf4j-log4j12:1.7.12'
-//    compile 'org.slf4j:slf4j-simple:1.7.12'
 
-    androidTestCompile 'org.slf4j:slf4j-api:1.7.12'
-//    androidTestCompile 'org.slf4j:slf4j-log4j12:1.7.12'
-//    androidTestCompile 'org.slf4j:slf4j-simple:1.7.12'
 
+    // Instrumentation testing
     androidTestCompile "com.andrewreitz:spock-android:1.2.1"
     androidTestCompile 'com.android.support.test:testing-support-lib:0.1'
 
@@ -81,4 +77,19 @@ dependencies {
 
     // Optional, needed for mocking
     androidTestCompile "com.google.dexmaker:dexmaker:1.2"
+
+
+
+    // Unit testing
+    testCompile('org.robospock:robospock:0.6.0-rc') {
+        exclude group: 'org.codehaus.groovy'
+        exclude group: 'org.spockframework'
+        exclude group: 'com.android.support'
+    }
+
+    testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
+        exclude group: 'org.codehaus.groovy'
+    }
+
+    testCompile 'org.mockito:mockito-all:1.9.5'
 }

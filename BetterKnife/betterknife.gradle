@@ -40,8 +40,8 @@ task jar(type: Jar) {
 
 dependencies {
     compile "org.codehaus.groovy:groovy:$commonVersions.grooidVersion:grooid"
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.android.support:support-v4:22.2.0'
+    compile "com.android.support:appcompat-v7:$commonVersions.androidSupportVersion"
+    compile "com.android.support:support-v4:$commonVersions.androidSupportVersion"
 }
 
 // Script to upload plugin to Maven

@@ -1,4 +1,4 @@
-package com.github.s0nerik.betterknife.sample.test
+package com.github.s0nerik.betterknife.inject_view_activities.inheritance
 
 import android.support.v7.app.AppCompatActivity
 import android.widget.Button
@@ -14,9 +14,4 @@ class ParentActivity extends AppCompatActivity {
     @InjectView(R.id.btn_one)
     Button btnOne
 
-//    @Override
-//    protected void onCreate(@Nullable Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState)
-//        contentView = R.layout.activity_inheritance
-//    }
 }

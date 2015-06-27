@@ -1,4 +1,4 @@
-package com.github.s0nerik.betterknife.sample.test
+package com.github.s0nerik.betterknife.inject_view_activities.inheritance
 
 import android.widget.Button
 import com.github.s0nerik.betterknife.annotations.InjectView

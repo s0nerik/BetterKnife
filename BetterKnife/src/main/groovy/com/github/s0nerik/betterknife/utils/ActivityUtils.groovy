@@ -62,7 +62,7 @@ final class ActivityUtils {
     }
 
     static void injectViews(ClassNode activityClass) throws Exception {
-        if(isActivityHasInjectedParent(activityClass)) return
+        if(isActivityHasInjectedParent(activityClass) || activityClass.superClass.getAnnotations(ClassHelper.make(InjectLayout))) return
 
         def onCreateMethod = activityClass.methods.find {it.name == "onCreate" && it.parameters.size() == 1}
         if (!onCreateMethod) {
