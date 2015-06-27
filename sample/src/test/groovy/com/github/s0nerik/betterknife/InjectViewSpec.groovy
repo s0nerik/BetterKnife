@@ -6,6 +6,7 @@ import com.github.s0nerik.betterknife.inject_view.activity.Activity3
 import com.github.s0nerik.betterknife.inject_view.activity.inheritance.ChildActivity
 import com.github.s0nerik.betterknife.inject_view.fragment.Fragment1
 import com.github.s0nerik.betterknife.inject_view.fragment.Fragment2
+import com.github.s0nerik.betterknife.inject_view.fragment.Fragment3
 import com.github.s0nerik.betterknife.inject_view.fragment.inheritance.ChildFragment
 import com.github.s0nerik.betterknife.util.SampleSpecification
 import org.robolectric.Robolectric
@@ -50,7 +51,7 @@ class InjectViewSpec extends SampleSpecification {
         activity.testFlag
     }
 
-    def "injecting views into fragment without @InjectLayout and onCreateView() defined"() {
+    def "injecting views into fragment without @InjectLayout and no onViewCreated() defined"() {
         given:
         def fragment = new Fragment1()
 
@@ -61,7 +62,7 @@ class InjectViewSpec extends SampleSpecification {
         fragment.tv1
     }
 
-    def "injecting views into fragment with @InjectLayout and no onCreateView() defined"() {
+    def "injecting views into fragment with @InjectLayout and no onViewCreated() defined"() {
         given:
         def fragment = new Fragment2()
 
@@ -70,6 +71,18 @@ class InjectViewSpec extends SampleSpecification {
 
         then:
         fragment.tv1
+    }
+
+    def "injecting views into fragment with @InjectLayout and onViewCreated() defined"() {
+        given:
+        def fragment = new Fragment3()
+
+        when:
+        FragmentTestUtil.startFragment(fragment)
+
+        then:
+        fragment.tv1
+        fragment.testFlag
     }
 
     def "injecting views into fragment inherited from base fragment"() {
