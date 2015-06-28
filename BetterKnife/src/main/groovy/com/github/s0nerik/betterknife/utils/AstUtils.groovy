@@ -146,6 +146,18 @@ final class AstUtils {
     }
 
     /**
+     * Adds a new line with specified statement.
+     * @param method
+     * @param statement
+     */
+    static void appendStatements(MethodNode method, List<Statement> statements) {
+        def methodStatements = getMethodStatements(method)
+        statements.each {
+            methodStatements << it
+        }
+    }
+
+    /**
      * Look for return statement position in a block statment
      * @param blockStatement Block statement
      * @return Found method position in block, -1 if not found

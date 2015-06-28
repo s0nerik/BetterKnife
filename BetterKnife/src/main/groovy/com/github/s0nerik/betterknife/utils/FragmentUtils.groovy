@@ -7,7 +7,6 @@ import groovy.transform.CompileStatic
 import org.codehaus.groovy.ast.AnnotationNode
 import org.codehaus.groovy.ast.ClassHelper
 import org.codehaus.groovy.ast.ClassNode
-import org.codehaus.groovy.ast.FieldNode
 import org.codehaus.groovy.ast.MethodNode
 import org.codehaus.groovy.ast.expr.BinaryExpression
 import org.codehaus.groovy.ast.expr.Expression
@@ -62,37 +61,6 @@ final class FragmentUtils {
         node.addAnnotation(new AnnotationNode(ClassHelper.make(Override)))
 
         return node
-    }
-
-    /**
-     * Creates a single view injection line that should be added to the _injectViews() method.
-     * @param fieldNode View to inject into
-     * @param id Resource id
-     * @return Single view injection line
-     */
-    private static Statement createInjectViewLine(FieldNode fieldNode, Expression id) {
-        // field = (field.type) view.findViewById(id)
-        return assignS(varX(fieldNode), castX(fieldNode.type, callX(varX("view"), 'findViewById', id)))
-    }
-
-    /**
-     * Adds a single view injection line into _injectViews() method.
-     * @param methodNode Method where the statement should be appended
-     * @param fieldNode View to inject into
-     * @param id Resource id
-     */
-    static void appendFindViewByIdStatement(MethodNode methodNode, FieldNode fieldNode, Expression id) {
-        AstUtils.appendStatement(methodNode, createInjectViewLine(fieldNode, id))
-    }
-
-    /**
-     *
-     * @param id
-     * @return resources.getIdentifier(id, "id", activity.getPackageName())
-     */
-    static Expression createGetIdentifier(String id) {
-        // resources.getIdentifier("viewName", "id", activity.getPackageName())
-        callX(varX("resources"), "getIdentifier", args(constX(id), constX("id"), callX(varX("activity"), "getPackageName")))
     }
 
     /**

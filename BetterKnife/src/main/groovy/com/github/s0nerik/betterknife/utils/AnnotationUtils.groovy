@@ -1,5 +1,4 @@
 package com.github.s0nerik.betterknife.utils
-
 import android.os.Bundle
 import android.view.View
 import com.github.s0nerik.betterknife.annotations.Parcelable
@@ -8,13 +7,8 @@ import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.Statement
-import org.codehaus.groovy.ast.stmt.TryCatchStatement
-
-import java.lang.reflect.Method
 
 import static org.codehaus.groovy.ast.tools.GeneralUtils.*
-import static org.codehaus.groovy.ast.tools.GeneralUtils.args
-
 /**
  * Created by Arasthel on 17/08/14.
  */
@@ -348,5 +342,13 @@ public class AnnotationUtils {
 
     }
 
+    static String camelCaseToLowerCase(String str) {
+        str = str.replaceAll(~/(.)([A-Z][a-z]+)/, { all, g1, g2 ->
+            "${g1}_${g2}"
+        })
+        return str.replaceAll(~/([a-z0-9])([A-Z])/, { all, g1, g2 ->
+            "${g1}_${g2}"
+        }).toLowerCase()
+    }
 
 }

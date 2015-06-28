@@ -47,20 +47,6 @@ final class ActivityUtils {
         return stmt(callThisX("setContentView", id))
     }
 
-    static void appendFindViewByIdStatement(MethodNode methodNode, FieldNode fieldNode, Expression id) {
-        AstUtils.appendStatement(methodNode, createInjectLine(fieldNode, id))
-    }
-
-    static Statement createInjectLine(FieldNode fieldNode, Expression id) {
-        // field = (field.type) findViewById(id)
-        return assignS(varX(fieldNode), castX(fieldNode.type, callThisX('findViewById', id)))
-    }
-
-    static Expression createGetIdentifier(String id) {
-        // resources.getIdentifier("viewName", "id", getPackageName())
-        callX(varX("resources"), "getIdentifier", args(constX(id), constX("id"), callThisX("getPackageName")))
-    }
-
     static void injectViews(ClassNode activityClass) throws Exception {
         if(isActivityHasInjectedParent(activityClass) || activityClass.superClass.getAnnotations(ClassHelper.make(InjectLayout))) return
 

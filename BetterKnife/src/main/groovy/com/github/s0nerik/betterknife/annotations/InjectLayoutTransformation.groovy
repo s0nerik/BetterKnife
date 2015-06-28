@@ -51,7 +51,7 @@ final class InjectLayoutTransformation extends AbstractASTTransformation {
 
             if (injectAllViews) {
                 views?.each {
-                    ActivityUtils.appendFindViewByIdStatement(injectViewsMethod, it, ActivityUtils.createGetIdentifier(it.name))
+                    InjectionUtils.appendFindViewByIdStatement(injectViewsMethod, it, InjectionUtils.createGetIdentifier(classNode, it.name))
                 }
             }
         } else if (AstUtils.isSubclass(classNode, Fragment)) {
@@ -59,7 +59,7 @@ final class InjectLayoutTransformation extends AbstractASTTransformation {
 
             if (injectAllViews) {
                 views?.each {
-                    FragmentUtils.appendFindViewByIdStatement(injectViewsMethod, it, FragmentUtils.createGetIdentifier(it.name))
+                    InjectionUtils.appendFindViewByIdStatement(injectViewsMethod, it, InjectionUtils.createGetIdentifier(classNode, it.name))
                 }
                 FragmentUtils.injectViews(classNode)
             }
