@@ -39,7 +39,7 @@ final class InjectViewTransformation extends AbstractASTTransformation {
         }
 
         // View id expression
-        def id = annotation.getMember "value" ?: fieldNode.name
+        def idExpression = annotation.getMember "value"
 
         if (!SUPPORTED_CLASSES.find {AstUtils.isSubclass(declaringClass, it)}) {
             addError("@InjectView can only be applied to the fields of Activity or Fragment.", declaringClass)
@@ -48,16 +48,20 @@ final class InjectViewTransformation extends AbstractASTTransformation {
 
         def injectMethod = InjectionUtils.getInjectViewsMethod declaringClass
 
+        if (idExpression) {
+            InjectionUtils.appendFindViewByIdStatement(injectMethod, fieldNode, idExpression)
+        } else {
+            InjectionUtils.appendFindViewByIdStatement(injectMethod, fieldNode, fieldNode.name)
+        }
+
         // Activity case
         if (AstUtils.isSubclass(declaringClass, Activity)) {
-            InjectionUtils.appendFindViewByIdStatement(injectMethod, fieldNode, id)
             try {
                 ActivityUtils.injectViews(declaringClass)
             } catch (Exception e) {
                 addError(e.message, declaringClass)
             }
         } else if (AstUtils.isSubclass(declaringClass, Fragment)) {
-            InjectionUtils.appendFindViewByIdStatement(injectMethod, fieldNode, id)
             FragmentUtils.injectViews(declaringClass)
         }
     }

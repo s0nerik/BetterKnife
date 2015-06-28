@@ -104,7 +104,7 @@ final class InjectionUtils {
         def findLowerCased = createFindViewByIdStatement(fieldNode, createGetIdentifier(methodNode.declaringClass, AnnotationUtils.camelCaseToLowerCase(idString)))
         def findOriginal = createFindViewByIdStatement(fieldNode, createGetIdentifier(methodNode.declaringClass, idString))
 
-        AstUtils.appendStatements(methodNode, [findLowerCased, ifS(equalsNullX(args(fieldNode.name)), findOriginal)])
+        AstUtils.appendStatements(methodNode, [findLowerCased, ifS(equalsNullX(varX(fieldNode)), findOriginal)])
     }
 
 }

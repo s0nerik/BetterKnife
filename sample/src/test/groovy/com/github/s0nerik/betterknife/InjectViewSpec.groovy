@@ -7,6 +7,7 @@ import com.github.s0nerik.betterknife.inject_view.activity.inheritance.ChildActi
 import com.github.s0nerik.betterknife.inject_view.fragment.Fragment1
 import com.github.s0nerik.betterknife.inject_view.fragment.Fragment2
 import com.github.s0nerik.betterknife.inject_view.fragment.Fragment3
+import com.github.s0nerik.betterknife.inject_view.fragment.Fragment4
 import com.github.s0nerik.betterknife.inject_view.fragment.inheritance.ChildFragment
 import com.github.s0nerik.betterknife.util.SampleSpecification
 import org.robolectric.Robolectric
@@ -83,6 +84,18 @@ class InjectViewSpec extends SampleSpecification {
         then:
         fragment.tv1
         fragment.testFlag
+    }
+
+    def "injecting views with implicit id"() {
+        given:
+        def fragment = new Fragment4()
+
+        when:
+        FragmentTestUtil.startFragment(fragment)
+
+        then:
+        fragment.textViewCamel
+        fragment.textViewLower
     }
 
     def "injecting views into fragment inherited from base fragment"() {
