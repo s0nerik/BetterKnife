@@ -1,6 +1,7 @@
 package com.github.s0nerik.betterknife.annotations
 
 import com.github.s0nerik.betterknife.utils.AnnotationUtils
+import com.github.s0nerik.betterknife.utils.InjectionUtils
 import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.ListExpression
@@ -25,7 +26,7 @@ public class InjectViewsTransformation implements ASTTransformation, Opcodes {
         AnnotationNode annotation = astNodes[0];
         ClassNode declaringClass = annotatedField.declaringClass;
 
-        MethodNode injectMethod = AnnotationUtils.getInjectViewsMethod(declaringClass);
+        MethodNode injectMethod = InjectionUtils.getInjectViewsMethod(declaringClass);
 
         Parameter viewParameter = injectMethod.parameters.first()
 
