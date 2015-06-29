@@ -29,11 +29,13 @@ final class FragmentUtils {
         def node = AstUtils.createMethod(
                 "onCreateView",
                 [
-                        returns: ClassHelper.make(View),
-                        params: params(param(ClassHelper.make(LayoutInflater), "inflater"),
-                                       param(ClassHelper.make(ViewGroup), "container"),
-                                       param(ClassHelper.make(Bundle), "savedInstanceState")),
-                        code: block(
+                        returnType: ClassHelper.make(View),
+                        params: params(
+                                        param(ClassHelper.make(LayoutInflater), "inflater"),
+                                        param(ClassHelper.make(ViewGroup), "container"),
+                                        param(ClassHelper.make(Bundle), "savedInstanceState")
+                        ),
+                        code      : block(
                                 // View v = inflater.inflate(id, container, false)
                                 declS(varX("v", ClassHelper.make(View)), callX(varX("inflater"), "inflate", args(id, varX("container"), constX(false)))),
                                 // return v

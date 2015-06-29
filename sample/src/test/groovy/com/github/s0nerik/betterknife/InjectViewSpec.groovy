@@ -3,6 +3,7 @@ package com.github.s0nerik.betterknife
 import com.github.s0nerik.betterknife.inject_view.activity.Activity1
 import com.github.s0nerik.betterknife.inject_view.activity.Activity2
 import com.github.s0nerik.betterknife.inject_view.activity.Activity3
+import com.github.s0nerik.betterknife.inject_view.activity.Activity4
 import com.github.s0nerik.betterknife.inject_view.activity.inheritance.ChildActivity
 import com.github.s0nerik.betterknife.inject_view.fragment.Fragment1
 import com.github.s0nerik.betterknife.inject_view.fragment.Fragment2
@@ -50,6 +51,26 @@ class InjectViewSpec extends SampleSpecification {
         activity.first
         activity.second
         activity.testFlag
+    }
+
+    def "listeners injection"() {
+        given:
+        def activity = Robolectric.buildActivity(Activity4).create().resume().start().visible().get()
+        def btn1 = Robolectric.shadowOf(activity.first)
+        def btn2 = Robolectric.shadowOf(activity.second)
+
+        expect:
+        btn1.onClickListener
+        btn2.onClickListener
+//        btn1.onLongClickListener
+//        btn1.onTouchListener
+
+        when:
+        btn1.checkedPerformClick()
+
+        then:
+//        activity.isFirstClicked
+        activity.isFirstOrSecondClicked
     }
 
     def "injecting views into fragment without @InjectLayout and no onViewCreated() defined"() {

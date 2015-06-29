@@ -13,7 +13,7 @@ import java.lang.annotation.Target
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-@GroovyASTTransformationClass(classes = [OnItemSelectedTransformation])
+@GroovyASTTransformationClass(classes = [InjectViewTransformation])
 public @interface OnItemSelected {
     int[] value();
 

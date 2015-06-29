@@ -26,7 +26,7 @@ public class InjectViewsTransformation implements ASTTransformation, Opcodes {
         AnnotationNode annotation = astNodes[0];
         ClassNode declaringClass = annotatedField.declaringClass;
 
-        MethodNode injectMethod = InjectionUtils.getInjectViewsMethod(declaringClass);
+        MethodNode injectMethod = InjectionUtils.getOrCreateInjectViewsMethod(declaringClass);
 
         Parameter viewParameter = injectMethod.parameters.first()
 

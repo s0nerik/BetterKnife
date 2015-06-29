@@ -18,9 +18,16 @@ final class ActivityUtils {
      * @return onCreate method with super call as a first line.
      */
     static MethodNode createOnCreateMethod() {
-        def node = AstUtils.createMethod "onCreate", [modifiers: Opcodes.ACC_PROTECTED,
-                                                      params   : params(param(ClassHelper.make(Bundle), "savedInstanceState")),
-                                                      code     : block(createSuperOnCreateCall("savedInstanceState"))]
+        /*
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState)
+        }
+        */
+        def node = AstUtils.createMethod "onCreate", [
+                modifiers: Opcodes.ACC_PROTECTED,
+                params   : params(param(ClassHelper.make(Bundle), "savedInstanceState")),
+                code     : block(createSuperOnCreateCall("savedInstanceState"))
+        ]
 
         node.addAnnotation(new AnnotationNode(ClassHelper.make(Override)))
 

@@ -1,4 +1,5 @@
 package com.github.s0nerik.betterknife.utils
+
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import groovyjarjarasm.asm.Opcodes
@@ -57,7 +58,7 @@ final class AstUtils {
         return new MethodNode(
                 name,
                 (args.modifiers ?: Opcodes.ACC_PUBLIC) as int,
-                (args.returns ?: ClassHelper.VOID_TYPE) as ClassNode,
+                (args.returnType ?: ClassHelper.VOID_TYPE) as ClassNode,
                 (args.params ?: params()) as Parameter[],
                 (args.exceptions ?: ClassNode.EMPTY_ARRAY) as ClassNode[],
                 (args.code ?: block()) as BlockStatement
@@ -193,6 +194,26 @@ final class AstUtils {
         return false
     }
 
+    static List<FieldNode> getAllAnnotatedFields(ClassNode thisClass, ClassNode annotationClass) {
+        return thisClass.fields.findAll { it.annotations.find { it.classNode == annotationClass } }
+    }
+
+    static List<MethodNode> getAllAnnotatedMethods(ClassNode thisClass, ClassNode annotationClass) {
+        return thisClass.methods.findAll { it.annotations.find { it.classNode == annotationClass } }
+    }
+
+    static Expression getAnnotationMember(AnnotatedNode annotatedNode, Class annotationClass, String name) {
+        return annotatedNode.getAnnotations(ClassHelper.make(annotationClass))[0].getMember(name)
+    }
+
+    static AnnotationNode getAnnotation(AnnotatedNode annotatedNode, Class annotationClass) {
+        return annotatedNode.getAnnotations(ClassHelper.make(annotationClass))[0]
+    }
+
+    static List<Class> getParameterTypes(MethodNode annotatedNode) {
+        return annotatedNode.parameters.collect { Parameter p -> p.type.typeClass }
+    }
+
     /**
      *
      * @param thisClass
@@ -230,6 +251,12 @@ final class AstUtils {
 
     static Statement findStatementByLabel(List<Statement> statements, String label) {
         statements.find { it?.statementLabel == label }
+    }
+
+    static String randomString(String alphabet, int n) {
+        new Random().with {
+            (1..n).collect { alphabet[ nextInt( alphabet.length() ) ] }.join('')
+        }
     }
 
 }

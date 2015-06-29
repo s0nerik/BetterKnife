@@ -3,6 +3,7 @@ package com.github.s0nerik.betterknife.annotations
 import android.support.v4.view.ViewPager
 import com.github.s0nerik.betterknife.BetterKnife
 import com.github.s0nerik.betterknife.utils.AnnotationUtils
+import com.github.s0nerik.betterknife.utils.InjectionUtils
 import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.ListExpression
@@ -27,7 +28,7 @@ public class OnPageChangedTransformation implements ASTTransformation, Opcodes {
         AnnotationNode annotation = astNodes[0];
         ClassNode declaringClass = annotatedMethod.declaringClass;
 
-        MethodNode injectMethod = AnnotationUtils.getInjectViewsMethod(declaringClass);
+        MethodNode injectMethod = InjectionUtils.getInjectViewsMethod(declaringClass);
 
         def ids = [];
 

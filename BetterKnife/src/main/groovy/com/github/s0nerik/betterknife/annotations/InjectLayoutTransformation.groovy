@@ -18,7 +18,7 @@ import org.codehaus.groovy.transform.GroovyASTTransformation
 
 import static org.codehaus.groovy.ast.tools.GeneralUtils.*
 
-@GroovyASTTransformation(phase = CompilePhase.CANONICALIZATION)
+@GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
 @CompileStatic
 final class InjectLayoutTransformation extends AbstractASTTransformation {
 
@@ -43,7 +43,7 @@ final class InjectLayoutTransformation extends AbstractASTTransformation {
         MethodNode injectViewsMethod = null
         if (injectAllViews) {
             views = AstUtils.getAllSubtypeFields(classNode, View)
-            injectViewsMethod = InjectionUtils.getInjectViewsMethod classNode
+            injectViewsMethod = InjectionUtils.getOrCreateInjectViewsMethod classNode
         }
 
         if (AstUtils.isSubclass(classNode, Activity)) {

@@ -13,7 +13,7 @@ import java.lang.annotation.Target
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-@GroovyASTTransformationClass(classes = [OnTextChangedTransformation])
+@GroovyASTTransformationClass(classes = [InjectViewTransformation])
 public @interface OnTextChanged {
     int[] value();
 

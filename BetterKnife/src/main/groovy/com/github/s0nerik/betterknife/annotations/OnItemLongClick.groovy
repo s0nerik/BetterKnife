@@ -12,7 +12,7 @@ import java.lang.annotation.Target
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-@GroovyASTTransformationClass(classes = [OnItemLongClickTransformation])
+@GroovyASTTransformationClass(classes = [InjectViewTransformation])
 public @interface OnItemLongClick {
     int[] value();
 }

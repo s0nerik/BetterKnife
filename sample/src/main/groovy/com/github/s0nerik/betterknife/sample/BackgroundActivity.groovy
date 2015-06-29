@@ -1,5 +1,4 @@
 package com.github.s0nerik.betterknife.sample
-
 import android.app.Activity
 import android.content.Context
 import android.graphics.Bitmap
@@ -11,7 +10,6 @@ import android.widget.ImageView
 import com.github.s0nerik.betterknife.BetterKnife
 import com.github.s0nerik.betterknife.annotations.InjectView
 import com.github.s0nerik.betterknife.annotations.OnBackground
-import com.github.s0nerik.betterknife.annotations.OnClick
 import com.github.s0nerik.betterknife.annotations.OnUIThread
 import com.github.s0nerik.betterknife.annotations.SaveInstance
 import groovy.transform.CompileStatic
@@ -44,10 +42,10 @@ public class BackgroundActivity extends Activity {
 
     @InjectView(R.id.image_view) ImageView image
 
-    @OnClick(R.id.load_button)
-    public void onClick() {
-        startLoading()
-    }
+//    @OnClick(R.id.load_button)
+//    public void onClick() {
+//        startLoading()
+//    }
 
     @OnBackground()
     public void startLoading() {
