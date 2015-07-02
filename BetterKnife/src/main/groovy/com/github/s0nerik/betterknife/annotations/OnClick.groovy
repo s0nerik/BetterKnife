@@ -12,7 +12,7 @@ import java.lang.annotation.Target
  */
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.METHOD)
-@GroovyASTTransformationClass(classes = [InjectViewTransformation])
+@GroovyASTTransformationClass(classes = [InjectUITransformation])
 public @interface OnClick {
     int[] value();
 }

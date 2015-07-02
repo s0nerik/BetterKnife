@@ -1,10 +1,12 @@
 package com.github.s0nerik.betterknife.utils
-
 import groovy.transform.CompileStatic
 import groovy.transform.Memoized
 import groovyjarjarasm.asm.Opcodes
 import org.codehaus.groovy.ast.*
-import org.codehaus.groovy.ast.expr.*
+import org.codehaus.groovy.ast.expr.BinaryExpression
+import org.codehaus.groovy.ast.expr.Expression
+import org.codehaus.groovy.ast.expr.MethodCallExpression
+import org.codehaus.groovy.ast.expr.VariableExpression
 import org.codehaus.groovy.ast.stmt.BlockStatement
 import org.codehaus.groovy.ast.stmt.ExpressionStatement
 import org.codehaus.groovy.ast.stmt.ReturnStatement
@@ -34,7 +36,7 @@ final class AstUtils {
      * @return
      */
     static Statement createMethodCallStatementWithLabel(String methodName,
-                                                        ArgumentListExpression arguments = null,
+                                                        Expression arguments = null,
                                                         String label = methodName) {
         // this.method(arguments)
         def s = stmt(arguments ? callThisX(methodName, arguments) : callThisX(methodName))
@@ -164,7 +166,9 @@ final class AstUtils {
      * @return Found method position in block, -1 if not found
      */
     @Memoized
-    static boolean superClassHasAnnotation(ClassNode thisClass, AnnotationNode annotationNode) {
+    static boolean superClassHasAnnotation(ClassNode thisClass, Class annotationClass) {
+        def annotationNode = new AnnotationNode(ClassHelper.make(annotationClass))
+
         def c = thisClass.superClass
         while (c) {
             if (c.annotations.contains(annotationNode)) {
@@ -176,10 +180,12 @@ final class AstUtils {
     }
 
     @Memoized
-    static boolean superClassHasFieldWithAnnotation(ClassNode thisClass, ClassNode annotationClass) {
+    static boolean superClassHasFieldWithAnnotation(ClassNode thisClass, Class annotationClass) {
+        def annotationClassNode = ClassHelper.make(annotationClass)
+
         def c = thisClass.superClass
         while (c) {
-            if (classHasFieldWithAnnotation(c, annotationClass)) {
+            if (classHasFieldWithAnnotation(c, annotationClassNode)) {
                 return true
             }
             c = c.superClass
@@ -243,6 +249,11 @@ final class AstUtils {
         }
 
         return position
+    }
+
+    static MethodNode findDeclaredMethod(ClassNode classNode, String name, Parameter[] parameters) {
+        return classNode.getDeclaredMethod(name, parameters)
+//        return classNode.allDeclaredMethods.find { it.name == name && it.parameters.size() == paramsNum }
     }
 
     static MethodNode findMethod(ClassNode classNode, String name, int paramsNum) {

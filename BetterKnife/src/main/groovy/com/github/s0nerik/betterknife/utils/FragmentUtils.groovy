@@ -97,7 +97,7 @@ final class FragmentUtils {
         if (onViewCreatedMethod.code instanceof BlockStatement) {
             def onViewCreatedMethodStatements = AstUtils.getMethodStatements(onViewCreatedMethod)
 
-            def injectCall = InjectionUtils.createInjectViewsCall()
+            def injectCall = InjectionUtils.createInjectViewsCall(callThisX("getView"))
 
             if (!onViewCreatedMethodStatements.find { it?.statementLabel == injectCall.statementLabel }) {
                 onViewCreatedMethodStatements.add(0, injectCall)

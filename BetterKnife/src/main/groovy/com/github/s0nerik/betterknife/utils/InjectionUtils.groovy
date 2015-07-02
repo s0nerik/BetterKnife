@@ -1,7 +1,5 @@
 package com.github.s0nerik.betterknife.utils
 
-import android.app.Activity
-import android.support.v4.app.Fragment
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CompoundButton
@@ -17,26 +15,22 @@ import static org.codehaus.groovy.ast.tools.GeneralUtils.*
 
 @CompileStatic
 final class InjectionUtils {
-    static Statement createInjectViewsCall() {
-        return AstUtils.createMethodCallStatementWithLabel("_injectViews")
+    static Statement createInjectViewsCall(Expression view) {
+        return AstUtils.createMethodCallStatementWithLabel("_injectViews", view)
     }
 
     static boolean hasInjectViewsMethod(ClassNode classNode) {
-//        if (AstUtils.findMethod(classNode, "_injectViews", 0)) {
-//            return true
-//        }
-//        return false
-        return AstUtils.findMethod(classNode, "_injectViews", 0) as boolean
+        return AstUtils.findDeclaredMethod(classNode, "_injectViews", params(param(ClassHelper.make(View), "view"))) as boolean
     }
 
-    static MethodNode getOrCreateInjectViewsMethod(ClassNode classNode, ClassNode annotationClass = ClassHelper.make(InjectView)) {
-        MethodNode injectMethod = AstUtils.findMethod(classNode, "_injectViews", 0)
+    static MethodNode getOrCreateInjectViewsMethod(ClassNode classNode) {
+        MethodNode injectMethod = AstUtils.findDeclaredMethod(classNode, "_injectViews", params(param(ClassHelper.make(View), "view")))
 
         if (!injectMethod) {
-            injectMethod = AstUtils.createMethod "_injectViews"
-            if (AstUtils.superClassHasFieldWithAnnotation(classNode, annotationClass)) {
-                // super._injectViews()
-                AstUtils.appendStatement(injectMethod, AstUtils.createSuperCallStatement("_injectViews"))
+            injectMethod = AstUtils.createMethod "_injectViews", [params: param(ClassHelper.make(View), "view")]
+            if (AstUtils.superClassHasFieldWithAnnotation(classNode, InjectView)) {
+                // super._injectViews(view)
+                AstUtils.appendStatement(injectMethod, AstUtils.createSuperCallStatement("_injectViews", varX("view", ClassHelper.make(View))))
             }
             classNode.addMethod injectMethod
         }
@@ -47,22 +41,11 @@ final class InjectionUtils {
     /**
      *
      * @param id
-     * @return resources.getIdentifier(id, "id", activity.getPackageName())
+     * @return context.getResources().getIdentifier(id, "id", context.getPackageName())
      */
-    static Expression createGetIdentifier(ClassNode declaringClass, String id) {
-        Expression getPackageNameX
-
-        if (AstUtils.isSubclass(declaringClass, Activity)) {
-            // resources.getIdentifier("viewName", "id", getPackageName())
-            getPackageNameX = callThisX("getPackageName")
-        } else if (AstUtils.isSubclass(declaringClass, Fragment)) {
-            // resources.getIdentifier("viewName", "id", activity.getPackageName())
-            getPackageNameX = callX(varX("activity"), "getPackageName")
-        } else {
-            throw new Exception("getIdentifier can only be used inside Activity or Fragment")
-        }
-
-        return callX(varX("resources"), "getIdentifier", args( constX(id), constX("id"), getPackageNameX))
+    static Expression createGetIdentifierX(Expression context, String id) {
+        Expression getPackageNameX = callX(context, "getPackageName")
+        return callX(callX(context, "getResources"), "getIdentifier", args(constX(id), constX("id"), getPackageNameX))
     }
 
     /**
@@ -71,22 +54,14 @@ final class InjectionUtils {
      * @param id Resource id
      * @return Single view injection line
      */
-    private static Statement createFindViewByIdStatement(ClassNode declaringClass, VariableExpression fieldNode, Expression id) {
-        return assignS(fieldNode, createFindViewByIdX(declaringClass, fieldNode.type, id))
+    private static Statement createFindViewByIdS(Expression rootView, VariableExpression fieldNode, Expression id) {
+        // fieldNode = (fieldNode.type) rootView.findViewById(id)
+        return assignS(fieldNode, createFindViewByIdX(rootView, fieldNode.type, id))
     }
 
-    private static Expression createFindViewByIdX(ClassNode declaringClass, ClassNode viewClass, Expression id) {
-        Expression expression
-        if (AstUtils.isSubclass(declaringClass, Activity)) {
-            // (viewClass) findViewById(id)
-            expression = castX(viewClass, callThisX('findViewById', id))
-        } else if (AstUtils.isSubclass(declaringClass, Fragment)) {
-            // (viewClass) view.findViewById(id)
-            expression = castX(viewClass, callX(varX("view"), 'findViewById', id))
-        } else {
-            throw new Exception("findViewById can only be used inside Activity or Fragment")
-        }
-        return expression
+    private static Expression createFindViewByIdX(Expression rootView, ClassNode viewClass, Expression id) {
+        // (viewClass) rootView.findViewById(id)
+        return castX(viewClass, callX(rootView, 'findViewById', id))
     }
 
     /**
@@ -95,8 +70,8 @@ final class InjectionUtils {
      * @param fieldNode View to inject into
      * @param id Resource id
      */
-    static void appendFindViewByIdStatement(MethodNode methodNode, FieldNode fieldNode, Expression id) {
-        AstUtils.appendStatement(methodNode, createFindViewByIdStatement(methodNode.declaringClass, varX(fieldNode), id))
+    static void appendFindViewByIdS(Expression rootView, MethodNode methodNode, FieldNode fieldNode, Expression id) {
+        AstUtils.appendStatement(methodNode, createFindViewByIdS(rootView, varX(fieldNode), id))
     }
 
     /**
@@ -105,60 +80,23 @@ final class InjectionUtils {
      * @param fieldNode View to inject into
      * @param id Resource id as a String
      */
-    static void appendFindViewByIdStatement(MethodNode methodNode, FieldNode fieldNode, String idString) {
-        def findLowerCased = createFindViewByIdStatement(methodNode.declaringClass, varX(fieldNode), createGetIdentifier(methodNode.declaringClass, AnnotationUtils.camelCaseToLowerCase(idString)))
-        def findOriginal = createFindViewByIdStatement(methodNode.declaringClass, varX(fieldNode), createGetIdentifier(methodNode.declaringClass, idString))
+    static void appendFindViewByIdS(Expression rootView, MethodNode methodNode, FieldNode fieldNode, String idString) {
+        def findLowerCased = createFindViewByIdS(rootView, varX(fieldNode), createGetIdentifierX(callX(rootView, "getContext"), AnnotationUtils.camelCaseToLowerCase(idString)))
+        def findOriginal = createFindViewByIdS(rootView, varX(fieldNode), createGetIdentifierX(callX(rootView, "getContext"), idString))
 
         AstUtils.appendStatements(methodNode, [findLowerCased, ifS(equalsNullX(varX(fieldNode)), findOriginal)])
     }
 
-//    static void appendOnClickListenerStatement(MethodNode injectionMethod, MethodNode listener, Expression id) {
-////        def shareVariables = { VariableScope variableScope ->
-////            def scope = variableScope.copy()
-////            for (Iterator<Variable> vars = scope.referencedLocalVariablesIterator; vars.hasNext();) {
-////                Variable var = vars.next()
-////                var.setClosureSharedVariable(true)
-////            }
-////            scope
-////        }
-//
-//
-//        def listenerClosure = closureX(
-//                params(param(ClassHelper.make(View), "v")),
-//                stmt(listener.parameters ? callThisX(listener.name, varX("v")) : callThisX(listener.name))
-//        )
-////        listenerClosure.variableScope = injectionMethod.variableScope.copy()
-//        listenerClosure.variableScope = new VariableScope()
-//
-//        AstUtils.appendStatement(injectionMethod,
-//                /*
-//                findViewById(...).setOnClickListener { View v ->
-//                    listener(v) or listener()
-//                }
-//                 */
-////                block(
-////                        shareVariables(injectionMethod.variableScope),
-//                        stmt(
-//                                callX(
-//                                        createFindViewByIdX(listener.declaringClass, ClassHelper.make(View), id),
-//                                        "setOnClickListener",
-//                                        listenerClosure
-//                                )
-//                        )
-////                )
-//        )
-//    }
-
-    static Statement createListenerInjectionS(String listenerName, MethodNode listenerMethod, Expression viewId) {
+    static Statement createListenerInjectionS(Expression rootView, String listenerName, MethodNode listenerMethod, Expression viewId) {
         def listenerClosure = createListenerCallerClosureX(listenerName, listenerMethod)
         listenerClosure.variableScope = new VariableScope()
 
         /*
-        (findViewById(...) as viewType).setOnClickListener(listenerClosure)
+        (rootView.findViewById(...) as viewType).setOnClickListener(listenerClosure)
          */
         stmt(
                 callX(
-                        createFindViewByIdX(listenerMethod.declaringClass, ClassHelper.make(View), viewId),
+                        createFindViewByIdX(rootView, ClassHelper.make(View), viewId),
                         "setOn${listenerName.capitalize()}Listener",
                         listenerClosure
                 )

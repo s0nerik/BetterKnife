@@ -9,7 +9,7 @@ import java.lang.annotation.Target
 
 @Retention(RetentionPolicy.SOURCE)
 @Target([ElementType.FIELD])
-@GroovyASTTransformationClass(classes = [InjectViewTransformation])
+@GroovyASTTransformationClass(classes = [InjectUITransformation])
 @interface InjectView {
     int value() default -1;
 }

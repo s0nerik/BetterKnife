@@ -9,7 +9,7 @@ import java.lang.annotation.Target
 
 @Retention(RetentionPolicy.SOURCE)
 @Target([ElementType.TYPE])
-@GroovyASTTransformationClass(classes = [InjectLayoutTransformation])
+@GroovyASTTransformationClass(classes = [InjectLayoutTransformation, InjectUITransformation])
 @interface InjectLayout {
     int value() default -1;
     boolean injectAllViews() default false;

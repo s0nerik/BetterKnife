@@ -1,9 +1,6 @@
 package com.github.s0nerik.betterknife
 
-import com.github.s0nerik.betterknife.inject_view.activity.Activity1
-import com.github.s0nerik.betterknife.inject_view.activity.Activity2
-import com.github.s0nerik.betterknife.inject_view.activity.Activity3
-import com.github.s0nerik.betterknife.inject_view.activity.Activity4
+import com.github.s0nerik.betterknife.inject_view.activity.*
 import com.github.s0nerik.betterknife.inject_view.activity.inheritance.ChildActivity
 import com.github.s0nerik.betterknife.inject_view.fragment.Fragment1
 import com.github.s0nerik.betterknife.inject_view.fragment.Fragment2
@@ -21,8 +18,7 @@ class InjectViewSpec extends SampleSpecification {
         def childActivity = Robolectric.buildActivity(ChildActivity).create().get()
 
         expect:
-        childActivity.btnTwo
-        childActivity.btnOne
+        childActivity.btnOne && childActivity.btnTwo
     }
 
     def "injecting views into activity without @InjectLayout and onCreate() defined"() {
@@ -30,8 +26,7 @@ class InjectViewSpec extends SampleSpecification {
         def activity = Robolectric.buildActivity(Activity1).create().get()
 
         expect:
-        activity.first
-        activity.second
+        activity.first && activity.second
     }
 
     def "injecting views into activity with @InjectLayout and no onCreate() defined"() {
@@ -39,8 +34,7 @@ class InjectViewSpec extends SampleSpecification {
         def activity = Robolectric.buildActivity(Activity2).create().get()
 
         expect:
-        activity.first
-        activity.second
+        activity.first && activity.second
     }
 
     def "injecting views into activity with @InjectLayout and onCreate() defined"() {
@@ -48,9 +42,22 @@ class InjectViewSpec extends SampleSpecification {
         def activity = Robolectric.buildActivity(Activity3).create().get()
 
         expect:
-        activity.first
-        activity.second
-        activity.testFlag
+        activity.first && activity.second && activity.testFlag
+    }
+
+    def "injecting all views into activity with @InjectLayout(injectAllViews = true)"() {
+        given:
+        def activity = Robolectric.buildActivity(Activity5).create().get()
+
+        expect:
+        (activity."$field" as boolean) == exists
+
+        where:
+        field    || exists
+        'first'  || true
+        'second' || true
+        'third'  || true
+        'fourth' || false
     }
 
     def "listeners injection"() {
@@ -62,14 +69,11 @@ class InjectViewSpec extends SampleSpecification {
         expect:
         btn1.onClickListener
         btn2.onClickListener
-//        btn1.onLongClickListener
-//        btn1.onTouchListener
 
         when:
         btn1.checkedPerformClick()
 
         then:
-//        activity.isFirstClicked
         activity.isFirstOrSecondClicked
     }
 
@@ -103,8 +107,7 @@ class InjectViewSpec extends SampleSpecification {
         FragmentTestUtil.startFragment(fragment)
 
         then:
-        fragment.tv1
-        fragment.testFlag
+        fragment.tv1 && fragment.testFlag
     }
 
     def "injecting views with implicit id"() {
@@ -115,8 +118,7 @@ class InjectViewSpec extends SampleSpecification {
         FragmentTestUtil.startFragment(fragment)
 
         then:
-        fragment.textViewCamel
-        fragment.textViewLower
+        fragment.textViewCamel && fragment.textViewLower
     }
 
     def "injecting views into fragment inherited from base fragment"() {
@@ -127,8 +129,7 @@ class InjectViewSpec extends SampleSpecification {
         FragmentTestUtil.startFragment(fragment)
 
         then:
-        fragment.tv1
-        fragment.tv2
+        fragment.tv1 && fragment.tv2
     }
 
 }

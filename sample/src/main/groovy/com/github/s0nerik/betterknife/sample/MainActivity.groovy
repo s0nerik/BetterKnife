@@ -1,5 +1,6 @@
 package com.github.s0nerik.betterknife.sample
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
@@ -9,8 +10,10 @@ import android.widget.Button
 import android.widget.ListView
 import android.widget.TextView
 import com.github.s0nerik.betterknife.annotations.InjectView
+import com.github.s0nerik.betterknife.annotations.OnClick
 import com.github.s0nerik.betterknife.annotations.Profile
 import com.github.s0nerik.betterknife.dsl.components.GAsyncTask
+import com.github.s0nerik.betterknife.sample.inheritance.ChildActivity
 import groovy.transform.CompileStatic
 
 import static com.github.s0nerik.betterknife.dsl.AndroidDSL.async
@@ -51,14 +54,16 @@ public class MainActivity extends AppCompatActivity {
 //        true
 //    }
 //
-//    // tag::onClick[]
-//    @OnClick(R.id.first_button)
-//    @Profile
-//    public void clicked() {
-//        firstButton.text = 'I\'ve been clicked! Click me longer!'
+    // tag::onClick[]
+    @OnClick(R.id.first_button)
+    @Profile
+    public void clicked() {
+        def i = new Intent(this, ChildActivity.class)
+        startActivity i
+        firstButton.text = 'I\'ve been clicked! Click me longer!'
 //        profileMethod('param1Value', 'param2Value')
-//    }
-//    // end::onClick[]
+    }
+    // end::onClick[]
 //
 //    @OnLongClick(R.id.first_button)
 //    public boolean longClicked() {
@@ -109,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
         firstTextView.text = "$title <-- this thing was injected from strings.xml"
 
-        getSupportActionBar()?.title = title
+//        getSupportActionBar()?.title = title
 
         def items = generateItems()
         listView.adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items)

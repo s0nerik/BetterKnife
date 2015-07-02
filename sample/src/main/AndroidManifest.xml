@@ -21,7 +21,7 @@
         </activity>
 
         <activity android:name=".BackgroundActivity" />
-        <activity android:name="com.github.s0nerik.betterknife.inject_view.activity.inheritance.ChildActivity" />
+        <activity android:name="com.github.s0nerik.betterknife.sample.inheritance.ChildActivity" />
     </application>
 
 </manifest>
