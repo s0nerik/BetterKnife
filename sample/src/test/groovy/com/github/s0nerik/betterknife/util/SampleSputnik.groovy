@@ -13,9 +13,12 @@ class SampleSputnik extends RoboSputnik {
     public Config getConfig(Class<?> clazz) {
         Config classConfig = clazz.getAnnotation(Config.class);
         Config.Implementation config = new Config.Implementation(18,
-                "sample/src/main/AndroidManifest.xml",
+                "src/main/AndroidManifest.xml",
                 "",
-                "sample/src/main/res",
+                "src/main/res",
+//                "sample/src/main/AndroidManifest.xml",
+//                "",
+//                "sample/src/main/res",
                 18,
                 new Class[0],
                 Application.class,

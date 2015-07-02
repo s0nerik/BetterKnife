@@ -60,23 +60,6 @@ class InjectViewSpec extends SampleSpecification {
         'fourth' || false
     }
 
-    def "listeners injection"() {
-        given:
-        def activity = Robolectric.buildActivity(Activity4).create().resume().start().visible().get()
-        def btn1 = Robolectric.shadowOf(activity.first)
-        def btn2 = Robolectric.shadowOf(activity.second)
-
-        expect:
-        btn1.onClickListener
-        btn2.onClickListener
-
-        when:
-        btn1.checkedPerformClick()
-
-        then:
-        activity.isFirstOrSecondClicked
-    }
-
     def "injecting views into fragment without @InjectLayout and no onViewCreated() defined"() {
         given:
         def fragment = new Fragment1()
@@ -130,6 +113,23 @@ class InjectViewSpec extends SampleSpecification {
 
         then:
         fragment.tv1 && fragment.tv2
+    }
+
+    def "click listener injection (single id)"() {
+        given:
+        def activity = Robolectric.buildActivity(Activity4).create().resume().start().visible().get()
+        def btn1 = Robolectric.shadowOf(activity.first)
+        def btn2 = Robolectric.shadowOf(activity.second)
+
+        expect:
+        btn1.onClickListener
+        btn2.onClickListener
+
+        when:
+        btn1.checkedPerformClick()
+
+        then:
+        activity.isFirstOrSecondClicked
     }
 
 }

@@ -1,5 +1,6 @@
 package com.github.s0nerik.betterknife.utils
 
+import android.view.DragEvent
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CompoundButton
@@ -111,6 +112,12 @@ final class InjectionUtils {
                         stmt(listener.parameters ? callThisX(listener.name, varX("v")) : callThisX(listener.name))
                 )
                 break
+            case "LongClick":
+                closureX(
+                        params(param(ClassHelper.make(View), "v")),
+                        stmt(listener.parameters ? callThisX(listener.name, varX("v")) : callThisX(listener.name))
+                )
+                break
             case "Touch":
                 Expression innerX
                 switch(AstUtils.getParameterTypes(listener)) {
@@ -142,6 +149,40 @@ final class InjectionUtils {
                 }
                 closureX(
                         params(param(ClassHelper.make(CompoundButton), "btn"), param(ClassHelper.Boolean_TYPE, "b")),
+                        stmt(innerX)
+                )
+                break
+            case "FocusChange":
+                Expression innerX
+                switch(AstUtils.getParameterTypes(listener)) {
+                    case [View, boolean]:
+                        innerX = callThisX(listener.name, args(varX("v"), varX("b")))
+                        break
+                    case [boolean]:
+                        innerX = callThisX(listener.name, varX("b"))
+                        break
+                    default:
+                        throw new Exception("OnChange listener should have [View, boolean] or [boolean] parameters")
+                }
+                closureX(
+                        params(param(ClassHelper.make(View), "v"), param(ClassHelper.Boolean_TYPE, "b")),
+                        stmt(innerX)
+                )
+                break
+            case "Drag":
+                Expression innerX
+                switch(AstUtils.getParameterTypes(listener)) {
+                    case [View, DragEvent]:
+                        innerX = callThisX(listener.name, args(varX("v"), varX("b")))
+                        break
+                    case [DragEvent]:
+                        innerX = callThisX(listener.name, varX("b"))
+                        break
+                    default:
+                        throw new Exception("OnChange listener should have [View, DragEvent] or [DragEvent] parameters")
+                }
+                closureX(
+                        params(param(ClassHelper.make(View), "v"), param(ClassHelper.make(DragEvent), "b")),
                         stmt(innerX)
                 )
                 break

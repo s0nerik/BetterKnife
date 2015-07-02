@@ -121,6 +121,74 @@ final class InjectUITransformation extends AbstractASTTransformation {
             }
         }
 
+        // Inject OnLongClick listeners
+        def longClickListeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(OnLongClick))
+        longClickListeners.each { MethodNode listener ->
+
+            // View id expression
+            def idExpression = AstUtils.getAnnotationMember(listener, OnLongClick, "value")
+
+            if (idExpression instanceof ListExpression) {
+                def idExpressionList = idExpression as ListExpression
+                idExpressionList.expressions.each { Expression id ->
+                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "LongClick", listener, id))
+                }
+            } else {
+                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "LongClick", listener, idExpression))
+            }
+        }
+
+        // Inject OnTouch listeners
+        def touchListeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(OnTouch))
+        touchListeners.each { MethodNode listener ->
+
+            // View id expression
+            def idExpression = AstUtils.getAnnotationMember(listener, OnTouch, "value")
+
+            if (idExpression instanceof ListExpression) {
+                def idExpressionList = idExpression as ListExpression
+                idExpressionList.expressions.each { Expression id ->
+                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Touch", listener, id))
+                }
+            } else {
+                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Touch", listener, idExpression))
+            }
+        }
+
+        // Inject OnDrag listeners
+        def dragListeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(OnDrag))
+        dragListeners.each { MethodNode listener ->
+
+            // View id expression
+            def idExpression = AstUtils.getAnnotationMember(listener, OnDrag, "value")
+
+            if (idExpression instanceof ListExpression) {
+                def idExpressionList = idExpression as ListExpression
+                idExpressionList.expressions.each { Expression id ->
+                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Drag", listener, id))
+                }
+            } else {
+                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Drag", listener, idExpression))
+            }
+        }
+
+        // Inject OnFocusChange listeners
+        def focusListeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(OnFocus))
+        focusListeners.each { MethodNode listener ->
+
+            // View id expression
+            def idExpression = AstUtils.getAnnotationMember(listener, OnFocus, "value")
+
+            if (idExpression instanceof ListExpression) {
+                def idExpressionList = idExpression as ListExpression
+                idExpressionList.expressions.each { Expression id ->
+                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "FocusChange", listener, id))
+                }
+            } else {
+                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "FocusChange", listener, idExpression))
+            }
+        }
+
     }
 
 }
