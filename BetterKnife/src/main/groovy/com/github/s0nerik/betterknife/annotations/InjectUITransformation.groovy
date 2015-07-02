@@ -40,10 +40,10 @@ final class InjectUITransformation extends AbstractASTTransformation {
             }
         }
 
-        if (!SUPPORTED_CLASSES.find {AstUtils.isSubclass(declaringClass, it)}) {
-            addError("@${annotationNode.classNode.name} can only be applied to fields or methods of ${SUPPORTED_CLASSES}.", annotationNode)
-            return
-        }
+//        if (!SUPPORTED_CLASSES.find {AstUtils.isSubclass(declaringClass, it)}) {
+//            addError("@${annotationNode.classNode.name} can only be applied to fields or methods of ${SUPPORTED_CLASSES}.", annotationNode)
+//            return
+//        }
 
         // We don't need to do anything if we already have _injectViews() method
         if (InjectionUtils.hasInjectViewsMethod(declaringClass)) return
