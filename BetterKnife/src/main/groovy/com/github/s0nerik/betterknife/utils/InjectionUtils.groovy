@@ -1,9 +1,12 @@
 package com.github.s0nerik.betterknife.utils
 
 import android.view.DragEvent
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
+import android.widget.AdapterView
 import android.widget.CompoundButton
+import android.widget.TextView
 import com.github.s0nerik.betterknife.annotations.InjectView
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.ast.*
@@ -118,6 +121,52 @@ final class InjectionUtils {
                         stmt(listener.parameters ? callThisX(listener.name, varX("v")) : callThisX(listener.name))
                 )
                 break
+            case "ItemClick":
+                Expression innerX
+                switch(AstUtils.getParameterTypes(listener)) {
+                    case [AdapterView, View, int, long]:
+                        innerX = callThisX(listener.name, args(varX("parent"), varX("view"), varX("i"), varX("l")))
+                        break
+                    case [AdapterView, View, int]:
+                        innerX = callThisX(listener.name, args(varX("parent"), varX("view"), varX("i")))
+                        break
+                    case [AdapterView, View]:
+                        innerX = callThisX(listener.name, args(varX("parent"), varX("view")))
+                        break
+                    case [AdapterView]:
+                        innerX = callThisX(listener.name, args(varX("parent")))
+                        break
+                    case [View, int, long]:
+                        innerX = callThisX(listener.name, args(varX("view"), varX("i"), varX("l")))
+                        break
+                    case [View, int]:
+                        innerX = callThisX(listener.name, args(varX("view"), varX("i")))
+                        break
+                    case [View]:
+                        innerX = callThisX(listener.name, args(varX("view")))
+                        break
+                    case [int, long]:
+                        innerX = callThisX(listener.name, args(varX("i"), varX("l")))
+                        break
+                    case [int]:
+                        innerX = callThisX(listener.name, args(varX("i")))
+                        break
+                    case [long]:
+                        innerX = callThisX(listener.name, args(varX("l")))
+                        break
+                    default:
+                        throw new Exception("OnItemClick listener should take at least the item position argument (int)")
+                }
+                closureX(
+                        params(
+                                param(ClassHelper.make(AdapterView), "parent"),
+                                param(ClassHelper.make(View), "view"),
+                                param(ClassHelper.Integer_TYPE, "i"),
+                                param(ClassHelper.Long_TYPE, "l"),
+                        ),
+                        stmt(innerX)
+                )
+                break
             case "Touch":
                 Expression innerX
                 switch(AstUtils.getParameterTypes(listener)) {
@@ -132,6 +181,33 @@ final class InjectionUtils {
                 }
                 closureX(
                         params(param(ClassHelper.make(View), "v"), param(ClassHelper.make(MotionEvent), "motionEvent")),
+                        stmt(innerX)
+                )
+                break
+            case "EditorAction":
+                Expression innerX
+                switch(AstUtils.getParameterTypes(listener)) {
+                    case [TextView, int, KeyEvent]:
+                        innerX = callThisX(listener.name, args(varX("textView"), varX("actionId"), varX("keyEvent")))
+                        break
+                    case [int, KeyEvent]:
+                        innerX = callThisX(listener.name, args(varX("actionId"), varX("keyEvent")))
+                        break
+                    case [int]:
+                        innerX = callThisX(listener.name, args(varX("actionId")))
+                        break
+                    case [KeyEvent]:
+                        innerX = callThisX(listener.name, args(varX("actionId"), varX("keyEvent")))
+                        break
+                    default:
+                        throw new Exception("OnEditorAction listener should take at least the actionId parameter.")
+                }
+                closureX(
+                        params(
+                                param(ClassHelper.make(TextView), "textView"),
+                                param(ClassHelper.Integer_TYPE, "actionId"),
+                                param(ClassHelper.make(KeyEvent), "keyEvent"),
+                        ),
                         stmt(innerX)
                 )
                 break
