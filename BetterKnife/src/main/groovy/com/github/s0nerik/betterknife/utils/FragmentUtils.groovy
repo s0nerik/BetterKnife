@@ -36,10 +36,26 @@ final class FragmentUtils {
                                         param(ClassHelper.make(Bundle), "savedInstanceState")
                         ),
                         code      : block(
+                                // super.onCreateView(inflater, container, savedInstanceState)
+                                AstUtils.createSuperCallStatement(
+                                        "onCreateView",
+                                        args(
+                                                varX("inflater", ClassHelper.make(LayoutInflater)),
+                                                varX("container", ClassHelper.make(ViewGroup)),
+                                                varX("savedInstanceState", ClassHelper.make(Bundle))
+                                        )
+                                ),
                                 // View v = inflater.inflate(id, container, false)
-                                declS(varX("v", ClassHelper.make(View)), callX(varX("inflater"), "inflate", args(id, varX("container"), constX(false)))),
+                                declS(
+                                        varX("v", ClassHelper.make(View)),
+                                        callX(
+                                                varX("inflater", ClassHelper.make(LayoutInflater)),
+                                                "inflate",
+                                                args(id, varX("container", ClassHelper.make(ViewGroup)), constX(false, true))
+                                        )
+                                ),
                                 // return v
-                                returnS(varX("v"))
+                                returnS(varX("v", ClassHelper.make(View)))
                         )
                 ]
         )
@@ -56,8 +72,16 @@ final class FragmentUtils {
     static MethodNode createOnViewCreatedMethod() {
         def node = AstUtils.createMethod(
                 "onViewCreated",
-                [params: params(param(ClassHelper.make(View), "view"),
-                                param(ClassHelper.make(Bundle), "savedInstanceState"))]
+                [
+                        params: params(
+                                    param(ClassHelper.make(View), "view"),
+                                    param(ClassHelper.make(Bundle), "savedInstanceState")
+                        ),
+                        code  : block(
+                                    // super.onCreateView(view, savedInstanceState)
+                                    AstUtils.createSuperCallStatement("onViewCreated", args(varX("view", ClassHelper.make(View)), varX("savedInstanceState", ClassHelper.make(Bundle))))
+                        )
+                ]
         )
 
         node.addAnnotation(new AnnotationNode(ClassHelper.make(Override)))
@@ -100,7 +124,11 @@ final class FragmentUtils {
             def injectCall = InjectionUtils.createInjectViewsCall(callThisX("getView"))
 
             if (!onViewCreatedMethodStatements.find { it?.statementLabel == injectCall.statementLabel }) {
-                onViewCreatedMethodStatements.add(0, injectCall)
+                def pos = 0
+                if (onViewCreatedMethod.firstStatement?.statementLabels?.find {it == AstUtils.SUPER_CALL}) {
+                    pos = 1
+                }
+                onViewCreatedMethodStatements.add(pos, injectCall)
             }
         }
 

@@ -17,6 +17,8 @@ import static org.codehaus.groovy.ast.tools.GeneralUtils.*
 @CompileStatic
 final class AstUtils {
 
+    public static final String SUPER_CALL = "supercall"
+
     /**
      * Creates a super call for given method name and arguments.
      * @param methodName
@@ -25,7 +27,9 @@ final class AstUtils {
      */
     static Statement createSuperCallStatement(String methodName, Expression arguments = null) {
         // super.method(arguments)
-        return stmt(arguments ? callSuperX(methodName, arguments) : callSuperX(methodName))
+        def s = stmt(arguments ? callSuperX(methodName, arguments) : callSuperX(methodName))
+        s.addStatementLabel(SUPER_CALL)
+        return s
     }
 
     /**
