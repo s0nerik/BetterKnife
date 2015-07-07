@@ -1,4 +1,4 @@
-package com.github.s0nerik.betterknife.annotations
+package com.github.s0nerik.betterknife.annotations.testing
 
 import org.codehaus.groovy.transform.GroovyASTTransformationClass
 
@@ -8,8 +8,7 @@ import java.lang.annotation.RetentionPolicy
 import java.lang.annotation.Target
 
 @Retention(RetentionPolicy.SOURCE)
-@Target(ElementType.FIELD)
-@GroovyASTTransformationClass(classes = [InjectUITransformation])
-public @interface InjectViews {
-    int[] value();
+@Target(ElementType.METHOD)
+@GroovyASTTransformationClass(classes = [TestInvokeTransformation])
+@interface TestInvoke {
 }

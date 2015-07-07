@@ -132,13 +132,22 @@ class InjectViewSpec extends SampleSpecification {
         given:
         def fragment = new Fragment5()
         FragmentTestUtil.startVisibleFragment(fragment)
-        def tv1 = Robolectric.shadowOf(fragment.textViewCamel)
+        def tv1 = Robolectric.shadowOf(fragment.textViewLower)
 
         when:
         tv1.checkedPerformClick()
 
         then:
-        1 * fragment.onTextViewLowerClicked()
+        fragment.textViewClicked
+    }
+
+    def "injecting list of views into fragment"() {
+        given:
+        def fragment = new Fragment6()
+        FragmentTestUtil.startVisibleFragment(fragment)
+
+        expect:
+        fragment.btnList[0] && fragment.btnList[1]
     }
 
 }

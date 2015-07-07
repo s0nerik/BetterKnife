@@ -63,7 +63,8 @@ dependencies {
     compile "org.codehaus.groovy:groovy:$commonVersions.grooidVersion:grooid"
     compile "com.android.support:appcompat-v7:$commonVersions.androidSupportVersion"
     compile "com.android.support:support-v4:$commonVersions.androidSupportVersion"
-
+    compile "com.android.support:recyclerview-v7:$commonVersions.androidSupportVersion"
+    compile "com.android.support:percent:$commonVersions.androidSupportVersion"
 
 
     // Instrumentation testing
@@ -90,6 +91,8 @@ dependencies {
     testCompile('org.spockframework:spock-core:1.0-groovy-2.4') {
         exclude group: 'org.codehaus.groovy'
     }
+
+    testCompile 'cglib:cglib-nodep:2.2'
 
     testCompile 'org.mockito:mockito-all:1.9.5'
 }

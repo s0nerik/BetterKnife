@@ -34,8 +34,11 @@ final class InjectUITransformation extends AbstractASTTransformation {
 
         if (annotatedNode instanceof FieldNode) {
             def fieldNode = annotatedNode as FieldNode
-            if (!AstUtils.isSubclass(fieldNode.type, View)) {
+            if (annotationNode.classNode.typeClass == InjectView && !AstUtils.isSubclass(fieldNode.type, View)) {
                 addError("Annotated field must extend View class. Type: ${fieldNode.type.name}", fieldNode)
+                return
+            } else if (annotationNode.classNode.typeClass == InjectViews && !AstUtils.isSubclass(fieldNode.type, List)) {
+                addError("Annotated field must be List. Type: ${fieldNode.type.name}", fieldNode)
                 return
             }
         }
@@ -87,6 +90,11 @@ final class InjectUITransformation extends AbstractASTTransformation {
         }
     }
 
+    @Override
+    void addError(String msg, ASTNode expr) {
+        super.addError(msg, expr)
+    }
+
     static void injectAllAnnotatedViewsIntoMethod(MethodNode injectMethod) {
         def views = AstUtils.getAllAnnotatedFields(injectMethod.declaringClass, ClassHelper.make(InjectView))
 
@@ -98,6 +106,22 @@ final class InjectUITransformation extends AbstractASTTransformation {
                 InjectionUtils.appendFindViewByIdS varX("view", ClassHelper.make(View)), injectMethod, it, idExpression
             } else {
                 InjectionUtils.appendFindViewByIdS varX("view", ClassHelper.make(View)), injectMethod, it, it.name
+            }
+        }
+
+        def viewLists = AstUtils.getAllAnnotatedFields(injectMethod.declaringClass, ClassHelper.make(InjectViews))
+
+        viewLists.each {
+            // View id expression
+            def idExpression = AstUtils.getAnnotationMember(it, InjectViews, "value")
+
+            if (!idExpression instanceof ListExpression) {
+                throw new Exception("@InjectViews annotation should be applied to the list of id's")
+            }
+
+            def idExpressions = idExpression as ListExpression
+            idExpressions.expressions.eachWithIndex { Expression id, int i ->
+                InjectionUtils.appendFindAllViewsByIdS varX("view", ClassHelper.make(View)), injectMethod, viewLists[i], idExpressions.expressions
             }
         }
     }

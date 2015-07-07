@@ -62,6 +62,17 @@ final class InjectionUtils {
         return assignS(fieldNode, createFindViewByIdX(rootView, fieldNode.type, id))
     }
 
+    /**
+     * Creates a single view injection line that should be added to the _injectViews() method.
+     * @param fieldNode View to inject into
+     * @param id Resource id
+     * @return Single view injection line
+     */
+    private static Statement createFindViewByIdForListS(Expression rootView, VariableExpression fieldNode, ClassNode viewClass, Expression id) {
+        // fieldNode.add((viewClass) rootView.findViewById(id))
+        return stmt(callX(fieldNode, "add", createFindViewByIdX(rootView, viewClass, id)))
+    }
+
     private static Expression createFindViewByIdX(Expression rootView, ClassNode viewClass, Expression id) {
         // (viewClass) rootView.findViewById(id)
         return castX(viewClass, callX(rootView, 'findViewById', id))
@@ -75,6 +86,13 @@ final class InjectionUtils {
      */
     static void appendFindViewByIdS(Expression rootView, MethodNode methodNode, FieldNode fieldNode, Expression id) {
         AstUtils.appendStatement(methodNode, createFindViewByIdS(rootView, varX(fieldNode), id))
+    }
+
+    static void appendFindAllViewsByIdS(Expression rootView, MethodNode methodNode, FieldNode fieldNode, List<Expression> ids) {
+        def viewClass = fieldNode.type.genericsTypes ? fieldNode.type.genericsTypes[0].type : ClassHelper.make(View)
+        ids.each {
+            AstUtils.appendStatement(methodNode, createFindViewByIdForListS(rootView, varX(fieldNode), viewClass, it))
+        }
     }
 
     /**
