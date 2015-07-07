@@ -95,20 +95,25 @@ final class InjectUITransformation extends AbstractASTTransformation {
             def idExpression = AstUtils.getAnnotationMember(it, InjectView, "value")
 
             if (idExpression) {
-                InjectionUtils.appendFindViewByIdS(varX("view", ClassHelper.make(View)), injectMethod, it, idExpression)
+                InjectionUtils.appendFindViewByIdS varX("view", ClassHelper.make(View)), injectMethod, it, idExpression
             } else {
-                InjectionUtils.appendFindViewByIdS(varX("view", ClassHelper.make(View)), injectMethod, it, it.name)
+                InjectionUtils.appendFindViewByIdS varX("view", ClassHelper.make(View)), injectMethod, it, it.name
             }
         }
     }
 
     static void injectAllAnnotatedListenersIntoMethod(MethodNode injectMethod) {
-        injectAllListenersOfType injectMethod, OnClick, "Click"
-        injectAllListenersOfType injectMethod, OnLongClick, "LongClick"
-        injectAllListenersOfType injectMethod, OnItemClick, "ItemClick"
-        injectAllListenersOfType injectMethod, OnTouch, "Touch"
-        injectAllListenersOfType injectMethod, OnDrag, "Drag"
-        injectAllListenersOfType injectMethod, OnFocus, "FocusChange"
+        def listenerTypes = [
+                Click: OnClick,
+                LongClick: OnLongClick,
+                ItemClick: OnItemClick,
+                Touch: OnTouch,
+                Drag: OnDrag,
+                FocusChange: OnFocus
+        ]
+        listenerTypes.each {
+            injectAllListenersOfType injectMethod, it.value, it.key
+        }
     }
 
     static void injectAllListenersOfType(MethodNode injectMethod, Class type, String listenerName) {
@@ -122,7 +127,10 @@ final class InjectUITransformation extends AbstractASTTransformation {
             if (idExpression instanceof ListExpression) {
                 def idExpressionList = idExpression as ListExpression
                 idExpressionList.expressions.each { Expression id ->
-                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view", ClassHelper.make(View)), listenerName, listener, id))
+                    AstUtils.appendStatement(
+                            injectMethod,
+                            InjectionUtils.createListenerInjectionS(varX("view", ClassHelper.make(View)), listenerName, listener, id)
+                    )
                 }
             } else {
                 AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view", ClassHelper.make(View)), listenerName, listener, idExpression))
