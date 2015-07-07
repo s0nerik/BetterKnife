@@ -69,7 +69,7 @@ public class BackgroundActivity extends Activity {
         mContext = this;
         setContentView(R.layout.activity_background)
 
-        BetterKnife.inject(this)
+//        BetterKnife.inject(this)
         BetterKnife.restoreState(this, savedInstanceState)
 
         if(savedInstanceState == null){

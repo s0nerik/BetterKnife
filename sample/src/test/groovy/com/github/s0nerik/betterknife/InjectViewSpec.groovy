@@ -1,11 +1,7 @@
 package com.github.s0nerik.betterknife
-
 import com.github.s0nerik.betterknife.inject_view.activity.*
 import com.github.s0nerik.betterknife.inject_view.activity.inheritance.ChildActivity
-import com.github.s0nerik.betterknife.inject_view.fragment.Fragment1
-import com.github.s0nerik.betterknife.inject_view.fragment.Fragment2
-import com.github.s0nerik.betterknife.inject_view.fragment.Fragment3
-import com.github.s0nerik.betterknife.inject_view.fragment.Fragment4
+import com.github.s0nerik.betterknife.inject_view.fragment.*
 import com.github.s0nerik.betterknife.inject_view.fragment.inheritance.ChildFragment
 import com.github.s0nerik.betterknife.util.SampleSpecification
 import org.robolectric.Robolectric
@@ -130,6 +126,19 @@ class InjectViewSpec extends SampleSpecification {
 
         then:
         activity.isFirstOrSecondClicked
+    }
+
+    def "injecting click listener into fragment"() {
+        given:
+        def fragment = new Fragment5()
+        FragmentTestUtil.startVisibleFragment(fragment)
+        def tv1 = Robolectric.shadowOf(fragment.textViewCamel)
+
+        when:
+        tv1.checkedPerformClick()
+
+        then:
+        1 * fragment.onTextViewLowerClicked()
     }
 
 }

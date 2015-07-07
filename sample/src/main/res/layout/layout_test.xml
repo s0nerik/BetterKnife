@@ -25,19 +25,24 @@
 
     <Button
         android:id="@+id/btnTwo"
-        android:text="btn_one"
+        android:text="btn_two"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <Button
         android:id="@+id/BtnThree"
-        android:text="btn_one"
+        android:text="btn_three"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
     <ImageView
         android:id="@+id/img_one"
         android:src="@drawable/ic_launcher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <GridView
+        android:id="@+id/grid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

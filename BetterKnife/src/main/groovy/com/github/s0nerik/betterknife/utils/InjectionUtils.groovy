@@ -1,5 +1,4 @@
 package com.github.s0nerik.betterknife.utils
-
 import android.view.DragEvent
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -96,7 +95,7 @@ final class InjectionUtils {
         listenerClosure.variableScope = new VariableScope()
 
         /*
-        (rootView.findViewById(...) as viewType).setOnClickListener(listenerClosure)
+        (rootView.findViewById(...) as View).setOnClickListener(listenerClosure)
          */
         stmt(
                 callX(
@@ -108,163 +107,49 @@ final class InjectionUtils {
     }
 
     private static ClosureExpression createListenerCallerClosureX(String listenerName, MethodNode listener) {
+        def createArgsFor = { List<Class> classes ->
+            def argExprs = classes.collect { varX("_${it.simpleName.toLowerCase()}", ClassHelper.make(it)) }
+            args(argExprs as List<Expression>)
+        }
+
+        def createParamsFor = { List<Class> classes ->
+            def paramExprs = classes.collect { param(ClassHelper.make(it.name), "_${it.simpleName.toLowerCase()}") }
+            params(paramExprs as Parameter[])
+        }
+
+        println "paramTypes: ${AstUtils.getParameterTypes(listener)}"
+
+        Expression innerX = callThisX listener.name, createArgsFor(AstUtils.getParameterTypes(listener))
+        Parameter[] closureParams = []
+
         switch (listenerName.capitalize()) {
             case "Click":
-                closureX(
-                        params(param(ClassHelper.make(View), "v")),
-                        stmt(listener.parameters ? callThisX(listener.name, varX("v")) : callThisX(listener.name))
-                )
-                break
             case "LongClick":
-                closureX(
-                        params(param(ClassHelper.make(View), "v")),
-                        stmt(listener.parameters ? callThisX(listener.name, varX("v")) : callThisX(listener.name))
-                )
+                closureParams = createParamsFor([View])
                 break
             case "ItemClick":
-                Expression innerX
-                switch(AstUtils.getParameterTypes(listener)) {
-                    case [AdapterView, View, int, long]:
-                        innerX = callThisX(listener.name, args(varX("parent"), varX("view"), varX("i"), varX("l")))
-                        break
-                    case [AdapterView, View, int]:
-                        innerX = callThisX(listener.name, args(varX("parent"), varX("view"), varX("i")))
-                        break
-                    case [AdapterView, View]:
-                        innerX = callThisX(listener.name, args(varX("parent"), varX("view")))
-                        break
-                    case [AdapterView]:
-                        innerX = callThisX(listener.name, args(varX("parent")))
-                        break
-                    case [View, int, long]:
-                        innerX = callThisX(listener.name, args(varX("view"), varX("i"), varX("l")))
-                        break
-                    case [View, int]:
-                        innerX = callThisX(listener.name, args(varX("view"), varX("i")))
-                        break
-                    case [View]:
-                        innerX = callThisX(listener.name, args(varX("view")))
-                        break
-                    case [int, long]:
-                        innerX = callThisX(listener.name, args(varX("i"), varX("l")))
-                        break
-                    case [int]:
-                        innerX = callThisX(listener.name, args(varX("i")))
-                        break
-                    case [long]:
-                        innerX = callThisX(listener.name, args(varX("l")))
-                        break
-                    default:
-                        throw new Exception("OnItemClick listener should take at least the item position argument (int)")
-                }
-                closureX(
-                        params(
-                                param(ClassHelper.make(AdapterView), "parent"),
-                                param(ClassHelper.make(View), "view"),
-                                param(ClassHelper.Integer_TYPE, "i"),
-                                param(ClassHelper.Long_TYPE, "l"),
-                        ),
-                        stmt(innerX)
-                )
+                closureParams = createParamsFor([AdapterView, View, int, long])
                 break
             case "Touch":
-                Expression innerX
-                switch(AstUtils.getParameterTypes(listener)) {
-                    case [View, MotionEvent]:
-                        innerX = callThisX(listener.name, args(varX("v"), varX("motionEvent")))
-                        break
-                    case [MotionEvent]:
-                        innerX = callThisX(listener.name, varX("motionEvent"))
-                        break
-                    default:
-                        throw new Exception("OnTouch listener should have [View, MotionEvent] or [MotionEvent] parameters")
-                }
-                closureX(
-                        params(param(ClassHelper.make(View), "v"), param(ClassHelper.make(MotionEvent), "motionEvent")),
-                        stmt(innerX)
-                )
+                closureParams = createParamsFor([View, MotionEvent])
                 break
             case "EditorAction":
-                Expression innerX
-                switch(AstUtils.getParameterTypes(listener)) {
-                    case [TextView, int, KeyEvent]:
-                        innerX = callThisX(listener.name, args(varX("textView"), varX("actionId"), varX("keyEvent")))
-                        break
-                    case [int, KeyEvent]:
-                        innerX = callThisX(listener.name, args(varX("actionId"), varX("keyEvent")))
-                        break
-                    case [int]:
-                        innerX = callThisX(listener.name, args(varX("actionId")))
-                        break
-                    case [KeyEvent]:
-                        innerX = callThisX(listener.name, args(varX("actionId"), varX("keyEvent")))
-                        break
-                    default:
-                        throw new Exception("OnEditorAction listener should take at least the actionId parameter.")
-                }
-                closureX(
-                        params(
-                                param(ClassHelper.make(TextView), "textView"),
-                                param(ClassHelper.Integer_TYPE, "actionId"),
-                                param(ClassHelper.make(KeyEvent), "keyEvent"),
-                        ),
-                        stmt(innerX)
-                )
+                closureParams = createParamsFor([TextView, int, KeyEvent])
                 break
             case "CheckedChange":
-                Expression innerX
-                switch(AstUtils.getParameterTypes(listener)) {
-                    case [CompoundButton, boolean]:
-                        innerX = callThisX(listener.name, args(varX("btn"), varX("b")))
-                        break
-                    case [boolean]:
-                        innerX = callThisX(listener.name, varX("b"))
-                        break
-                    default:
-                        throw new Exception("OnChange listener should have [CompoundButton, boolean] or [boolean] parameters")
-                }
-                closureX(
-                        params(param(ClassHelper.make(CompoundButton), "btn"), param(ClassHelper.Boolean_TYPE, "b")),
-                        stmt(innerX)
-                )
+                closureParams = createParamsFor([CompoundButton, boolean])
                 break
             case "FocusChange":
-                Expression innerX
-                switch(AstUtils.getParameterTypes(listener)) {
-                    case [View, boolean]:
-                        innerX = callThisX(listener.name, args(varX("v"), varX("b")))
-                        break
-                    case [boolean]:
-                        innerX = callThisX(listener.name, varX("b"))
-                        break
-                    default:
-                        throw new Exception("OnChange listener should have [View, boolean] or [boolean] parameters")
-                }
-                closureX(
-                        params(param(ClassHelper.make(View), "v"), param(ClassHelper.Boolean_TYPE, "b")),
-                        stmt(innerX)
-                )
+                closureParams = createParamsFor([View, boolean])
                 break
             case "Drag":
-                Expression innerX
-                switch(AstUtils.getParameterTypes(listener)) {
-                    case [View, DragEvent]:
-                        innerX = callThisX(listener.name, args(varX("v"), varX("b")))
-                        break
-                    case [DragEvent]:
-                        innerX = callThisX(listener.name, varX("b"))
-                        break
-                    default:
-                        throw new Exception("OnChange listener should have [View, DragEvent] or [DragEvent] parameters")
-                }
-                closureX(
-                        params(param(ClassHelper.make(View), "v"), param(ClassHelper.make(DragEvent), "b")),
-                        stmt(innerX)
-                )
+                closureParams = createParamsFor([View, DragEvent])
                 break
             default:
                 throw new Exception("Listener not found")
         }
+
+        closureX(closureParams, stmt(innerX))
     }
 
 }

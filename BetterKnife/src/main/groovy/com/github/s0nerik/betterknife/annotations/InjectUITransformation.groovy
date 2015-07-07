@@ -103,92 +103,31 @@ final class InjectUITransformation extends AbstractASTTransformation {
     }
 
     static void injectAllAnnotatedListenersIntoMethod(MethodNode injectMethod) {
+        injectAllListenersOfType injectMethod, OnClick, "Click"
+        injectAllListenersOfType injectMethod, OnLongClick, "LongClick"
+        injectAllListenersOfType injectMethod, OnItemClick, "ItemClick"
+        injectAllListenersOfType injectMethod, OnTouch, "Touch"
+        injectAllListenersOfType injectMethod, OnDrag, "Drag"
+        injectAllListenersOfType injectMethod, OnFocus, "FocusChange"
+    }
 
-        // Inject OnClick listeners
-        def clickListeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(OnClick))
-        clickListeners.each { MethodNode listener ->
+    static void injectAllListenersOfType(MethodNode injectMethod, Class type, String listenerName) {
+        def listeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(type))
+
+        listeners.each { MethodNode listener ->
 
             // View id expression
-            def idExpression = AstUtils.getAnnotationMember(listener, OnClick, "value")
+            def idExpression = AstUtils.getAnnotationMember(listener, type, "value")
 
             if (idExpression instanceof ListExpression) {
                 def idExpressionList = idExpression as ListExpression
                 idExpressionList.expressions.each { Expression id ->
-                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Click", listener, id))
+                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view", ClassHelper.make(View)), listenerName, listener, id))
                 }
             } else {
-                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Click", listener, idExpression))
+                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view", ClassHelper.make(View)), listenerName, listener, idExpression))
             }
         }
-
-        // Inject OnLongClick listeners
-        def longClickListeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(OnLongClick))
-        longClickListeners.each { MethodNode listener ->
-
-            // View id expression
-            def idExpression = AstUtils.getAnnotationMember(listener, OnLongClick, "value")
-
-            if (idExpression instanceof ListExpression) {
-                def idExpressionList = idExpression as ListExpression
-                idExpressionList.expressions.each { Expression id ->
-                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "LongClick", listener, id))
-                }
-            } else {
-                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "LongClick", listener, idExpression))
-            }
-        }
-
-        // Inject OnTouch listeners
-        def touchListeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(OnTouch))
-        touchListeners.each { MethodNode listener ->
-
-            // View id expression
-            def idExpression = AstUtils.getAnnotationMember(listener, OnTouch, "value")
-
-            if (idExpression instanceof ListExpression) {
-                def idExpressionList = idExpression as ListExpression
-                idExpressionList.expressions.each { Expression id ->
-                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Touch", listener, id))
-                }
-            } else {
-                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Touch", listener, idExpression))
-            }
-        }
-
-        // Inject OnDrag listeners
-        def dragListeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(OnDrag))
-        dragListeners.each { MethodNode listener ->
-
-            // View id expression
-            def idExpression = AstUtils.getAnnotationMember(listener, OnDrag, "value")
-
-            if (idExpression instanceof ListExpression) {
-                def idExpressionList = idExpression as ListExpression
-                idExpressionList.expressions.each { Expression id ->
-                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Drag", listener, id))
-                }
-            } else {
-                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "Drag", listener, idExpression))
-            }
-        }
-
-        // Inject OnFocusChange listeners
-        def focusListeners = AstUtils.getAllAnnotatedMethods(injectMethod.declaringClass, ClassHelper.make(OnFocus))
-        focusListeners.each { MethodNode listener ->
-
-            // View id expression
-            def idExpression = AstUtils.getAnnotationMember(listener, OnFocus, "value")
-
-            if (idExpression instanceof ListExpression) {
-                def idExpressionList = idExpression as ListExpression
-                idExpressionList.expressions.each { Expression id ->
-                    AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "FocusChange", listener, id))
-                }
-            } else {
-                AstUtils.appendStatement(injectMethod, InjectionUtils.createListenerInjectionS(varX("view"), "FocusChange", listener, idExpression))
-            }
-        }
-
     }
 
 }
