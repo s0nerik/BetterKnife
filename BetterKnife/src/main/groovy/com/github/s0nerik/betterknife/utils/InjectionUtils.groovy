@@ -1,4 +1,5 @@
 package com.github.s0nerik.betterknife.utils
+
 import android.view.DragEvent
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -6,7 +7,7 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.CompoundButton
 import android.widget.TextView
-import com.github.s0nerik.betterknife.annotations.InjectView
+import com.github.s0nerik.betterknife.annotations.*
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.ClosureExpression
@@ -18,6 +19,11 @@ import static org.codehaus.groovy.ast.tools.GeneralUtils.*
 
 @CompileStatic
 final class InjectionUtils {
+    static final List<Class> INJECTION_ANNOTATIONS = [
+            InjectView, InjectViews,
+            OnClick, OnDrag, OnEditorAction, OnFocus, OnItemClick, OnLongClick, OnTouch
+    ]
+
     static Statement createInjectViewsCall(Expression view) {
         return AstUtils.createMethodCallStatementWithLabel("_injectViews", view)
     }
@@ -31,7 +37,7 @@ final class InjectionUtils {
 
         if (!injectMethod) {
             injectMethod = AstUtils.createMethod "_injectViews", [params: param(ClassHelper.make(View), "view")]
-            if (AstUtils.superClassHasFieldWithAnnotation(classNode, InjectView)) {
+            if (isSuperClassHasInjectViewAnnotations(classNode)) {
                 // super._injectViews(view)
                 AstUtils.appendStatement(injectMethod, AstUtils.createSuperCallStatement("_injectViews", varX("view", ClassHelper.make(View))))
             }
@@ -39,6 +45,12 @@ final class InjectionUtils {
         }
 
         return injectMethod
+    }
+
+    static boolean isSuperClassHasInjectViewAnnotations(ClassNode classNode) {
+        if (AstUtils.superClassHasAnnotation(classNode, InjectLayout)) return true
+        else if (AstUtils.superClassHasFieldWithAnnotation(classNode, INJECTION_ANNOTATIONS)) return true
+        return false
     }
 
     /**

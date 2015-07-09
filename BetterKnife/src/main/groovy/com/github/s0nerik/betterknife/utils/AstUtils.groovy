@@ -197,8 +197,29 @@ final class AstUtils {
         return false
     }
 
+    @Memoized
+    static boolean superClassHasFieldWithAnnotation(ClassNode thisClass, List<Class> annotationClasses) {
+        def annotationClassNodes = annotationClasses.collect { ClassHelper.make(it) }
+
+        def c = thisClass.superClass
+        while (c) {
+            if (classHasFieldWithAnnotation(c, annotationClassNodes)) {
+                return true
+            }
+            c = c.superClass
+        }
+        return false
+    }
+
     static boolean classHasFieldWithAnnotation(ClassNode thisClass, ClassNode annotationClass) {
         if (thisClass.fields.find { it.annotations.find {it.classNode == annotationClass} }) {
+            return true
+        }
+        return false
+    }
+
+    static boolean classHasFieldWithAnnotation(ClassNode thisClass, List<ClassNode> annotationClasses) {
+        if (annotationClasses.find { classHasFieldWithAnnotation(thisClass, it) }) {
             return true
         }
         return false
