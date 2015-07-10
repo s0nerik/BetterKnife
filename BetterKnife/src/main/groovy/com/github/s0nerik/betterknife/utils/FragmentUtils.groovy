@@ -112,6 +112,8 @@ final class FragmentUtils {
     }
 
     static void injectViews(ClassNode fragmentClass) {
+        if (InjectionUtils.isSuperClassHasInjectViewAnnotations(fragmentClass)) return
+
         MethodNode onViewCreatedMethod = AstUtils.findMethod(fragmentClass, "onViewCreated", 2)
         if (!onViewCreatedMethod) {
             onViewCreatedMethod = createOnViewCreatedMethod()

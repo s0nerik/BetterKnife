@@ -2,7 +2,8 @@ package com.github.s0nerik.betterknife
 import com.github.s0nerik.betterknife.inject_view.activity.*
 import com.github.s0nerik.betterknife.inject_view.activity.inheritance.ChildActivity
 import com.github.s0nerik.betterknife.inject_view.fragment.*
-import com.github.s0nerik.betterknife.inject_view.fragment.inheritance.ChildFragment
+import com.github.s0nerik.betterknife.inject_view.fragment.inheritance.ChildFragment1
+import com.github.s0nerik.betterknife.inject_view.fragment.inheritance.ChildFragment2
 import com.github.s0nerik.betterknife.util.SampleSpecification
 import org.robolectric.Robolectric
 import org.robolectric.util.FragmentTestUtil
@@ -102,7 +103,7 @@ class InjectViewSpec extends SampleSpecification {
 
     def "injecting views into fragment inherited from base fragment"() {
         given:
-        def fragment = new ChildFragment()
+        def fragment = new ChildFragment1()
 
         when:
         FragmentTestUtil.startFragment(fragment)
@@ -150,4 +151,12 @@ class InjectViewSpec extends SampleSpecification {
         fragment.btnList[0] && fragment.btnList[1]
     }
 
+    def "injecting click listener into fragment inherited from fragment with @InjectLayout(injectAllView = true)"() {
+        given:
+        def fragment = new ChildFragment2()
+        FragmentTestUtil.startVisibleFragment(fragment)
+
+        expect:
+        fragment.btnOne && fragment.btnTwo
+    }
 }

@@ -25,7 +25,7 @@ class TestInvokeTransformation extends AbstractASTTransformation {
         def methodNode = astNodes[1] as MethodNode
         ClassNode declaringClass = methodNode.declaringClass
 
-        def field = new FieldNode("${methodNode.name}Invoked", ACC_PUBLIC, Boolean_TYPE, declaringClass, constX(false))
+        def field = new FieldNode("${methodNode.name}Invoked", ACC_PUBLIC | ACC_SYNTHETIC, Boolean_TYPE, declaringClass, constX(false))
         declaringClass.addField field
 
         if (methodNode.code instanceof BlockStatement) {

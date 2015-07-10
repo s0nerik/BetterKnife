@@ -101,7 +101,7 @@ final class InjectionUtils {
     }
 
     static void appendFindAllViewsByIdS(Expression rootView, MethodNode methodNode, FieldNode fieldNode, List<Expression> ids) {
-        def viewClass = fieldNode.type.genericsTypes ? fieldNode.type.genericsTypes[0].type : ClassHelper.make(View)
+        def viewClass = fieldNode.type.genericsTypes?.head()?.type ?: ClassHelper.make(View)
         ids.each {
             AstUtils.appendStatement(methodNode, createFindViewByIdForListS(rootView, varX(fieldNode), viewClass, it))
         }

@@ -9,6 +9,7 @@ import com.github.s0nerik.betterknife.utils.InjectionUtils
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.ast.*
 import org.codehaus.groovy.ast.expr.ConstantExpression
+import org.codehaus.groovy.ast.expr.ConstructorCallExpression
 import org.codehaus.groovy.ast.expr.Expression
 import org.codehaus.groovy.ast.expr.ListExpression
 import org.codehaus.groovy.control.CompilePhase
@@ -16,6 +17,7 @@ import org.codehaus.groovy.control.SourceUnit
 import org.codehaus.groovy.transform.AbstractASTTransformation
 import org.codehaus.groovy.transform.GroovyASTTransformation
 
+import static org.codehaus.groovy.ast.tools.GeneralUtils.constX
 import static org.codehaus.groovy.ast.tools.GeneralUtils.varX
 
 @GroovyASTTransformation(phase = CompilePhase.SEMANTIC_ANALYSIS)
@@ -81,6 +83,8 @@ final class InjectUITransformation extends AbstractASTTransformation {
             injectAllViewsIntoMethod(injectMethod)
         else
             injectAllAnnotatedViewsIntoMethod(injectMethod)
+
+        injectViewLists(injectMethod)
     }
 
     static void injectAllViewsIntoMethod(MethodNode injectMethod) {
@@ -95,6 +99,27 @@ final class InjectUITransformation extends AbstractASTTransformation {
         super.addError(msg, expr)
     }
 
+    static void injectViewLists(MethodNode injectMethod) {
+        def viewLists = AstUtils.getAllAnnotatedFields(injectMethod.declaringClass, ClassHelper.make(InjectViews))
+
+        viewLists.eachWithIndex { FieldNode it, int i ->
+            // View id expression
+            def idExpression = AstUtils.getAnnotationMember(it, InjectViews, "value")
+
+            if (!idExpression instanceof ListExpression) {
+                throw new Exception("@InjectViews annotation should be applied to the list of id's")
+            }
+
+            def idExpressions = idExpression as ListExpression
+
+            it.initialValueExpression = new ListExpression()
+
+            idExpressions.expressions.each {
+                InjectionUtils.appendFindAllViewsByIdS varX("view", ClassHelper.make(View)), injectMethod, viewLists[i], idExpressions.expressions
+            }
+        }
+    }
+
     static void injectAllAnnotatedViewsIntoMethod(MethodNode injectMethod) {
         def views = AstUtils.getAllAnnotatedFields(injectMethod.declaringClass, ClassHelper.make(InjectView))
 
@@ -106,22 +131,6 @@ final class InjectUITransformation extends AbstractASTTransformation {
                 InjectionUtils.appendFindViewByIdS varX("view", ClassHelper.make(View)), injectMethod, it, idExpression
             } else {
                 InjectionUtils.appendFindViewByIdS varX("view", ClassHelper.make(View)), injectMethod, it, it.name
-            }
-        }
-
-        def viewLists = AstUtils.getAllAnnotatedFields(injectMethod.declaringClass, ClassHelper.make(InjectViews))
-
-        viewLists.each {
-            // View id expression
-            def idExpression = AstUtils.getAnnotationMember(it, InjectViews, "value")
-
-            if (!idExpression instanceof ListExpression) {
-                throw new Exception("@InjectViews annotation should be applied to the list of id's")
-            }
-
-            def idExpressions = idExpression as ListExpression
-            idExpressions.expressions.eachWithIndex { Expression id, int i ->
-                InjectionUtils.appendFindAllViewsByIdS varX("view", ClassHelper.make(View)), injectMethod, viewLists[i], idExpressions.expressions
             }
         }
     }
