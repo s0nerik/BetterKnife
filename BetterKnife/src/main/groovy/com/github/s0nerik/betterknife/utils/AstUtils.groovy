@@ -171,11 +171,11 @@ final class AstUtils {
      */
     @Memoized
     static boolean superClassHasAnnotation(ClassNode thisClass, Class annotationClass) {
-        def annotationNode = new AnnotationNode(ClassHelper.make(annotationClass))
+        def annotationNode = ClassHelper.make(annotationClass)
 
         def c = thisClass.superClass
         while (c) {
-            if (c.annotations.contains(annotationNode)) {
+            if (c.annotations.find {it.classNode == annotationNode}) {
                 return true
             }
             c = c.superClass

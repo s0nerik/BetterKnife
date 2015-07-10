@@ -49,7 +49,7 @@ final class InjectionUtils {
 
     static boolean isSuperClassHasInjectViewAnnotations(ClassNode classNode) {
         if (AstUtils.superClassHasAnnotation(classNode, InjectLayout)) return true
-        else if (AstUtils.superClassHasFieldWithAnnotation(classNode, INJECTION_ANNOTATIONS)) return true
+        if (AstUtils.superClassHasFieldWithAnnotation(classNode, INJECTION_ANNOTATIONS)) return true
         return false
     }
 
