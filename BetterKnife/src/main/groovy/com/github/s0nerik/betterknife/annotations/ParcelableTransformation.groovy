@@ -53,9 +53,10 @@ public class ParcelableTransformation extends AbstractASTTransformation implemen
         // We add the CREATOR field
         createCREATORField(annotatedClass, sourceUnit)
         // We add an empty constructor
-        annotatedClass.addConstructor(createEmptyConstructor());
+        def newEmptyConstructor = createEmptyConstructor(annotatedClass)
+        if (newEmptyConstructor) annotatedClass.addConstructor(newEmptyConstructor);
         // We add a constructor which takes only one Parcel argument
-        annotatedClass.addConstructor(createParcelConstructor(annotatedClass));
+        createOrUpdateParcelConstructor(annotatedClass);
         println "Implemented Parcelable class for $annotatedClass"
     }
 
@@ -146,15 +147,28 @@ public class ParcelableTransformation extends AbstractASTTransformation implemen
         return parcelableFields
     }
 
-    ConstructorNode createParcelConstructor(ClassNode annotatedClass) {
+    ConstructorNode createOrUpdateParcelConstructor(ClassNode annotatedClass) {
         Parameter parcelParameter = new Parameter(ClassHelper.make(Parcel).plainNodeReference,
                 'parcel')
+        def existingConstructor = annotatedClass.getDeclaredConstructor(parcelParameter)
         Statement code = readFromParcelCode(annotatedClass, parcelParameter)
-        return new ConstructorNode(ACC_PUBLIC, params(parcelParameter), ClassNode.EMPTY_ARRAY, code)
+        if (existingConstructor) {
+            (existingConstructor.code as BlockStatement).addStatement(code)
+            return existingConstructor
+        } else {
+            def newConstructor = new ConstructorNode(ACC_PUBLIC, params(parcelParameter), ClassNode.EMPTY_ARRAY, code)
+            annotatedClass.addConstructor(newConstructor)
+            return newConstructor
+        }
     }
 
-    ConstructorNode createEmptyConstructor() {
-        return new ConstructorNode(ACC_PUBLIC, new BlockStatement())
+    ConstructorNode createEmptyConstructor(ClassNode annotatedClass) {
+        def existingConstructor = annotatedClass.getDeclaredConstructor()
+        if (!existingConstructor) {
+            return new ConstructorNode(ACC_PUBLIC, new BlockStatement())
+        } else {
+            return null
+        }
     }
 
     MethodNode createDescribeContentsMethod() {
