@@ -21,4 +21,5 @@ import java.lang.annotation.Target
      * @return
      */
     Class exclude() default Closure
+    boolean executeEmptyConstructor() default true
 }

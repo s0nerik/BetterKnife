@@ -36,12 +36,14 @@ public class ParcelableTransformation extends AbstractASTTransformation implemen
     ]
 
     List<FieldNode> excludedFields = []
+    boolean executeEmptyConstructor = true
 
     @Override
     void visit(ASTNode[] astNodes, SourceUnit sourceUnit) {
         AnnotationNode annotation = (AnnotationNode) astNodes[0];
         ClassNode annotatedClass = (ClassNode) astNodes[1];
         readExcludedFields(annotation, annotatedClass)
+        executeEmptyConstructor = annotation.members?.executeEmptyConstructor?.asBoolean()
         // We implement the interface
         annotatedClass.addInterface(ClassHelper.make(android.os.Parcelable))
         // We add the describeContents method
@@ -152,6 +154,9 @@ public class ParcelableTransformation extends AbstractASTTransformation implemen
                 'parcel')
         def existingConstructor = annotatedClass.getDeclaredConstructor(parcelParameter)
         Statement code = readFromParcelCode(annotatedClass, parcelParameter)
+        if (executeEmptyConstructor) {
+            (code as BlockStatement).addStatement(annotatedClass.getDeclaredConstructor().code)
+        }
         if (existingConstructor) {
             (existingConstructor.code as BlockStatement).addStatement(code)
             return existingConstructor
