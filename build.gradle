@@ -1,71 +1,36 @@
-import com.android.build.gradle.tasks.MergeResources
-
-ext {
-    minSdkVersion = 8
-    targetSdkVersion = 22
-    versionCode = 1
-
-    commonVersions = [
-            grooidVersion: '2.4.3',
-            androidSupportVersion: '22.2.0',
-            buildToolsVersion: '22.0.1',
-            compileSdkVersion: 22
-    ]
-}
-
 buildscript {
     repositories {
         jcenter()
-        mavenCentral()
+        maven { url "https://jitpack.io" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
-        classpath 'org.codehaus.groovy:gradle-groovy-android-plugin:0.3.6'
-        classpath 'org.asciidoctor:asciidoctor-gradle-plugin:1.5.0'
-        classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
-        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:1.2"
+        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.github.groovy:groovy-android-gradle-plugin:9ed9d0e'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4'
     }
 }
 
-apply plugin: 'org.asciidoctor.gradle.asciidoctor'
-
-allprojects {
-    apply plugin: 'idea'
-    repositories {
-        jcenter()
-    }
-
-    version = VERSION_NAME
-    group = GROUP
+repositories {
+    jcenter()
+    maven { url "https://jitpack.io" }
 }
 
-gradle.taskGraph.whenReady {
-    allprojects {
-        tasks.withType(GroovyCompile) { task ->
-            logger.lifecycle("Task $task")
-            task.groovyOptions.forkOptions.jvmArgs = ['-noverify']
-        }
-        tasks.withType(MergeResources) { task ->
-            task.process9Patch = false
-        }
+apply plugin: 'com.android.library'
+apply plugin: 'groovyx.android'
+apply plugin: 'com.github.dcendents.android-maven'
+
+group='com.github.s0nerik'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.0"
+    defaultConfig {
+        minSdkVersion 14
     }
 }
 
-tasks.whenTaskAdded {
-    if (it.name.contains('lint') || it.name.contains('Lint')) {
-        it.enabled = false
-    }
-}
-
-asciidoctor {
-    sourceDir = 'docs' as  File
-    options = [
-        attributes: [
-            'imagesdir':'images',
-            'icons': 'font',
-            'source-highlighter': 'prettify',
-            'toc': 'left'
-        ]
-    ]
+dependencies {
+    compile 'org.codehaus.groovy:groovy:2.4.7:grooid'
+    compile 'com.android.support:appcompat-v7:24.0.0'
+    compile 'com.android.support:support-v4:24.0.0'
 }
