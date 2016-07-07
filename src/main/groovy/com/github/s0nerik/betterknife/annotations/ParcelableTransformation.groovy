@@ -43,7 +43,8 @@ public class ParcelableTransformation extends AbstractASTTransformation implemen
         AnnotationNode annotation = (AnnotationNode) astNodes[0];
         ClassNode annotatedClass = (ClassNode) astNodes[1];
         readExcludedFields(annotation, annotatedClass)
-        executeEmptyConstructor = annotation.getMember 'executeEmptyConstructor'
+        if (annotation.members.containsKey('executeEmptyConstructor'))
+            executeEmptyConstructor = annotation.members.executeEmptyConstructor
         // We implement the interface
         annotatedClass.addInterface(ClassHelper.make(android.os.Parcelable))
         // We add the describeContents method
